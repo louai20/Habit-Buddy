@@ -1,5 +1,13 @@
-import { Text } from "react-native"
-import { reactiveModel } from "/src/bootstrapping"  // src/boostrapping also works
+import { Text } from "react-native"// src/boostrapping also works
+import { Provider } from 'react-redux';
+import { store } from '../store/store';
+import { Habits } from '../components/Habits';
   
 // TODO pass reactive model down to presenters
-export default function IndexPage() { return <Text>Hello React Native!</Text> }
+export default function IndexPage() { 
+    
+    return <Provider store={store}>
+        <Habits />
+    </Provider>
+}
+
