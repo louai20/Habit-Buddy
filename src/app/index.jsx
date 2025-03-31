@@ -1,13 +1,14 @@
-import { Text } from "react-native"// src/boostrapping also works
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { store } from '../store/store';
-import { Habits } from '../components/Habits';
+//import { Habits } from '../components/Habits';
+import  AuthPresenter  from "../presenters/authPresenter";
+
   
-// TODO pass reactive model down to presenters
 export default function IndexPage() { 
-    
-    return <Provider store={store}>
-        <Habits />
+  return (
+    <Provider store={store}>
+      <AuthPresenter />
     </Provider>
+  );
 }
 
