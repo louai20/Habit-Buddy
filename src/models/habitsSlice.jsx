@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { collection, getDocs, query, orderBy, doc, setDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import firebaseConfig from '../firebaseConfig';
-import {app, db} from '../firebaseConfig';
+import { db} from '../firebaseConfig';
 
 // Async thunk for fetching habits
 export const fetchHabits = createAsyncThunk(
