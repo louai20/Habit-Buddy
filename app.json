@@ -23,7 +23,6 @@
       },
       "web": {
         "bundler": "metro",
-        "output": "static",
         "favicon": "./assets/images/habits.png",
         "backgroundColor": "#ffffff"
       },
