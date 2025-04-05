@@ -1,21 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { auth, provider, db } from "../firebaseConfig";
-import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth, db } from "../firebaseConfig";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // Initial State
 const initialState = {
   user: null,
   loading: false,
   error: null,
+  token: null,
 };
 
-// Async actions
-export const loginWithGoogle = createAsyncThunk("auth/loginWithGoogle", async (_, { rejectWithValue }) => {
+// Register with Email
+export const registerWithEmail = createAsyncThunk("auth/registerWithEmail", async ({ email, password, name }, { rejectWithValue }) => {
   try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    // Save the user's uid to localStorage
+    AsyncStorage.setItem("uid", user.uid);
+    // Set displayName after registration
+    await updateProfile(user, { displayName: name });
 
     const userData = {
       uid: user.uid,
@@ -24,41 +28,23 @@ export const loginWithGoogle = createAsyncThunk("auth/loginWithGoogle", async (_
       photoURL: user.photoURL,
     };
 
-    // Save user in Firestore if not exists
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (!userDoc.exists()) {
-      await setDoc(doc(db, "users", user.uid), userData);
-    }
-
-    return userData;
-  } catch (error) {
-    return rejectWithValue(error.message);
-  }
-});
-
-export const registerWithEmail = createAsyncThunk("auth/registerWithEmail", async ({ email, password, name }, { rejectWithValue }) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    const userData = {
-      uid: user.uid,
-      name: name,
-      email: user.email,
-      photoURL: null,
-    };
-
+    // Save user data to Firestore
     await setDoc(doc(db, "users", user.uid), userData);
+
     return userData;
   } catch (error) {
-    return rejectWithValue(error.message);
+    return rejectWithValue(error.message || "An unknown error occurred");
   }
 });
 
+// Login with Email
 export const loginWithEmail = createAsyncThunk("auth/loginWithEmail", async ({ email, password }, { rejectWithValue }) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
+    // Save the user's uid to localStorage
+    AsyncStorage.setItem("uid", user.uid);
 
     return {
       uid: user.uid,
@@ -67,44 +53,58 @@ export const loginWithEmail = createAsyncThunk("auth/loginWithEmail", async ({ e
       photoURL: user.photoURL,
     };
   } catch (error) {
+    console.error("Login failed: ", error.message); // Log the error message
     return rejectWithValue(error.message);
   }
 });
-
+// Logout
 export const logout = createAsyncThunk("auth/logout", async () => {
-  await signOut(auth);
-  return null;
+  await signOut(auth); // Sign out from Firebase
+  AsyncStorage.removeItem("uid"); // Remove the uid from localStorage
+  return null; // Clear user data from Redux store
 });
+
 
 // Create Redux Slice
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    // Action to set the user data
+    setUser: (state, action) => {
+      state.user = action.payload;  // Save user data in the state
+    },
+    // Action to set loading state (for example, during async operations)
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    // Action to set error state
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(loginWithGoogle.pending, (state) => {
+      .addCase(loginWithEmail.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+      .addCase(loginWithEmail.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
       })
-      .addCase(loginWithGoogle.rejected, (state, action) => {
+      .addCase(loginWithEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(registerWithEmail.fulfilled, (state, action) => {
         state.user = action.payload;
       })
-      .addCase(loginWithEmail.fulfilled, (state, action) => {
-        state.user = action.payload;
-      })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
-      });
+        state.token = null; // Clear token on logout
+      })
   },
 });
-
+export const { setUser, setLoading, setError } = authSlice.actions;
 export default authSlice.reducer;

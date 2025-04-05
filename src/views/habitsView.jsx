@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 
 export function HabitsView(props) {
   console.log("rendering habits view");
@@ -38,7 +38,7 @@ export function HabitsView(props) {
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   buttonBlue: {
     backgroundColor: "#007AFF",
     padding: 10,
@@ -82,4 +82,4 @@ const styles = {
     marginTop: 10,
     textAlign: "center",
   },
-};
+})
