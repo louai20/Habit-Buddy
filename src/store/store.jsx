@@ -2,7 +2,7 @@ import { configureStore, combineReducers, createListenerMiddleware  } from '@red
 import habitsReducer, { increment, decrement } from '../models/habitsSlice';
 import authReducer from '../models/authSlice';
 import weatherReducer from '../models/weatherSlice';
-import quotesReducer from './models/quotesSlice';
+import quotesReducer from '../models/quotesSlice';
 import { setDoc, doc } from 'firebase/firestore';
 import { db} from '../firebaseConfig';
 
