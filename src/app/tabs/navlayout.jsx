@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import HabitsPresenter from '../../presenters/habitsPresenter';
 import RegisterPresenter from '../../presenters/registerPresenter';
 import LoginPresenter from '../../presenters/loginPresenter';
-import MotivationPage from '../../pages/MotivationPage';
+import MotivationPage from '../../components/MotivationPage';
 
 const Tab = createBottomTabNavigator();
 
