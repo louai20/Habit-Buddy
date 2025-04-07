@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 import HabitsPresenter from '../../presenters/habitsPresenter';
 import RegisterPresenter from '../../presenters/registerPresenter';
 import LoginPresenter from '../../presenters/loginPresenter';
+import MotivationPage from '../../pages/MotivationPage';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,14 @@ export default function TabsLayout() {
           options={{
             title: 'Habits',
             tabBarIcon: () => <Text>📊</Text>,
+          }}
+        />
+        <Tab.Screen
+          name="motivation"
+          component={MotivationPage}
+          options={{
+            title: 'Motivation',
+            tabBarIcon: () => <Text>💬</Text>,
           }}
         />
         <Tab.Screen
