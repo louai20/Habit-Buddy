@@ -5,17 +5,32 @@ export const fetchQuote = createAsyncThunk(
   'quotes/fetchQuote',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("https://zenquotes.io/api/random");
-      if (!response.ok) {
-        throw new Error("Failed to fetch quote");
-      }
+      // Bust cache with timestamp
+      const timestamp = new Date().getTime();
+      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent("https://zenquotes.io/api/random")}&_=${timestamp}`;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("ZenQuotes fetch failed");
+
       const data = await response.json();
+      if (!Array.isArray(data) || !data[0]?.q || data[0]?.q.includes("Too many requests")) {
+        throw new Error("ZenQuotes rate limit or malformed response");
+      }
+
       return {
         text: data[0].q,
         author: data[0].a,
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      const staticQuotes = [
+        { text: "Stay hungry. Stay foolish.", author: "Steve Jobs" },
+        { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
+        { text: "Do something today that your future self will thank you for.", author: "Unknown" },
+        { text: "Consistency is key. Keep showing up.", author: "Habit Buddy" },
+        { text: "Small steps every day lead to big change.", author: "Habit Buddy" },
+      ];
+      const random = staticQuotes[Math.floor(Math.random() * staticQuotes.length)];
+      return random;
     }
   }
 );

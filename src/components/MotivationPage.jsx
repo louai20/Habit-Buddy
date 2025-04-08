@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
+import { Button } from 'react-native';
 
 export default function MotivationPage() {
   const dispatch = useDispatch();
@@ -35,6 +36,8 @@ export default function MotivationPage() {
       ) : quote ? (
         <Text style={styles.quote}>"{quote.text}" — {quote.author}</Text>
       ) : null}
+
+      <Button title="New Quote" onPress={() => dispatch(fetchQuote())} />
 
       {weatherLoading ? (
         <ActivityIndicator size="small" />
