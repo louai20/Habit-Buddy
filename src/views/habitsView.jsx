@@ -1,85 +1,46 @@
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet } from 'react-native';
 
-export function HabitsView(props) {
-  console.log("rendering habits view");
-
+export function HabitsView({ habits }) {
+    console.log("rendering habits view with habits", habits);
   return (
-    <View style={{ padding: 20 }}>
-      {/* Display Loading State */}
-      {props.loading && (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.text}>Loading habits...</Text>
-        </View>
-      )}
-
-      {/* Display Error State */}
-      {props.error && (
-        <View style={styles.center}>
-          <Text style={styles.errorText}>Error: {props.error}</Text>
-        </View>
-      )}
-
-      {/* Display Habit Counter Value */}
-      {!props.loading && !props.error && (
-        <>
-          <Text style={styles.title}>Habits Counter: {props.value}</Text>
-
-          <TouchableOpacity style={styles.buttonRed} onPress={props.onDecrement}>
-            <Text style={styles.textWhite}>Decrement the local value</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonGreen} onPress={props.onIncrement}>
-            <Text style={styles.textWhite}>Increment the local value</Text>
-          </TouchableOpacity>
-        </>
+    <View style={styles.container}>
+      <Text style={styles.title}>Your Habits</Text>
+      {habits?.length > 0 ? (
+        habits.map((habit) => (
+          <View key={habit.id} style={styles.habitItem}>
+            <Text style={styles.habitName}>Habit name: {habit.name}</Text>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.noHabits}>No habits yet</Text>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  buttonBlue: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  buttonGreen: {
-    backgroundColor: "#34C759",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  buttonRed: {
-    backgroundColor: "#FF3B30",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  textWhite: {
-    color: "white",
-    textAlign: "center",
+  container: {
+    padding: 16,
+    flex: 1,
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
-  center: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
+  habitItem: {
+    padding: 12,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    marginBottom: 8,
   },
-  text: {
+  habitName: {
     fontSize: 16,
-    color: "#007AFF",
-    marginTop: 10,
   },
-  errorText: {
+  noHabits: {
     fontSize: 16,
-    color: "#FF3B30",
-    marginTop: 10,
-    textAlign: "center",
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 20,
   },
-})
+});

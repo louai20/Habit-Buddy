@@ -3,25 +3,32 @@ import { connect } from "react-redux";
 import { HabitsView } from "../views/habitsView";
 import { fetchHabits, setHabit, increment, decrement } from "../models/habitsSlice";
 import { useEffect } from "react";
+
 const mapStateToProps = (state) => ({
-  value: state.habits.value,
+  habits: state.habits.habits,
   loading: state.habits.loading,
   error: state.habits.error,
+  user: state.auth.user
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onFetchHabits: () => dispatch(fetchHabits()),
-  onSetHabit: (value) => dispatch(setHabit({ id: "habit_" + Date.now(), habitData: { value } })),
-  onIncrement: () => dispatch(increment()),
-  onDecrement: () => dispatch(decrement()),
+  onFetchHabits: (userId) => dispatch(fetchHabits(userId)),
 });
 
-const HabitsPresenter = (props) => {
-  // Fetch habits once when the app starts could be done in the store or somewhere else
+const HabitsPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
   useEffect(() => {
-    props.onFetchHabits(); // Dispatch the fetchHabits action to load the habits data
-  }, []);
-  return <HabitsView {...props} />;
+    if (user?.uid) {
+      onFetchHabits(user.uid); // Fetch habits if user ID is available
+    }
+  }, [user]); 
+
+  // Check if user is logged in
+  if (!user?.uid) {
+    return <p>Please log in to see your habits</p>;
+  }
+
+  // Return the HabitsView component with the necessary props
+  return <HabitsView habits={habits} loading={loading} error={error} />;
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitsPresenter);

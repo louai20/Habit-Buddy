@@ -1,16 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, getDoc, query, doc, setDoc } from 'firebase/firestore';
-import { db} from '../firebaseConfig';
+import { collection, getDoc, query, orderBy, addDoc, where, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { db } from "../firebaseConfig";
+
+const DOCUMENT = "users";
 
 // Async thunk for fetching habits
 export const fetchHabits = createAsyncThunk(
   'habits/fetchHabits',
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try {
-      console.log("fetching habits");
-      const docSnapshot = await getDoc(doc(db, 'habits', "testDocuments"));
+      console.log(`Fetching habits for user: ${userId}`);
+      const docSnapshot = await getDoc(doc(db, DOCUMENT, userId));
       if (docSnapshot.exists()) {
-        return docSnapshot.data().value; 
+        console.log("habits found", docSnapshot.data());
+        return docSnapshot.data(); 
       } else {
         return rejectWithValue('Habit not found'); 
       }
@@ -21,22 +24,32 @@ export const fetchHabits = createAsyncThunk(
 );
 
 // Async thunk for setting a habit
-/* export const setHabit = createAsyncThunk(
+export const setHabit = createAsyncThunk(
   'habits/setHabit',
-  async ({ id, habitData }, { rejectWithValue }) => {
+  async ({ habitData, userId }) => {
     try {
-      console.log("setting habit", habitData);
-      const habitRef = doc(db, 'habits', "testDocuments");
-      await setDoc(habitRef, habitData, { merge: true });
-      return habitData.value;
+ 
+      const userHabitsDoc = doc(db, DOCUMENT, userId);
+      
+      // Create a new habit with a unique ID
+      const newHabit = {
+        id: Date.now().toString(), // Simple unique ID using timestamp
+        ...habitData
+      };
+  
+      await setDoc(userHabitsDoc, {
+        habits: arrayUnion(newHabit)
+      }, { merge: true });
+  
+      console.log('Habit successfully added:', newHabit);
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('Error adding habit:', error);
     }
   }
-); */
+);
 
 const initialState = {
-  value: 0,  // Simple numeric value
+  habits: [],
   loading: false,
   error: null,
 };
@@ -60,7 +73,7 @@ export const habitsSlice = createSlice({
     })
     .addCase(fetchHabits.fulfilled, (state, action) => {
       state.loading = false;
-      state.value = action.payload;
+      state.habits = action.payload.habits;
     })
     .addCase(fetchHabits.rejected, (state, action) => {
       state.loading = false;
