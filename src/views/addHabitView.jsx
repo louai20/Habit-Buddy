@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { setHabit } from '../models/habitsSlice';
 import { useState } from 'react';
 import DatePicker from 'react-native-date-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,10 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-export function AddHabitView(props) {
-  const dispatch = useDispatch();
-  const userId = useSelector((state) => state.auth?.user?.uid);
-
+export function AddHabitView({ user, onSetHabit }) {
   const [habitData, setHabitData] = useState({
     name: '',
     description: '',
@@ -44,8 +39,6 @@ export function AddHabitView(props) {
       );
     }
 
-    console.log("submit habitData", habitData);
-
     try {
       const newHabit = {
         ...habitData,
@@ -53,7 +46,7 @@ export function AddHabitView(props) {
         endDate: habitData.endDate.toISOString(),
       };
 
-      await dispatch(setHabit({ habitData: newHabit, userId }));
+      await onSetHabit(newHabit, user.uid);
 
       Alert.alert('Success', 'Habit created!');
       setHabitData({
@@ -69,7 +62,7 @@ export function AddHabitView(props) {
     }
   };
 
-  if (!userId) {
+  if (!user) {
     return (
       <View style={styles.container}>
         <Text style={styles.loginMessage}>You need to log in first</Text>
