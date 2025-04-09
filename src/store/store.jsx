@@ -46,8 +46,8 @@ listenerMiddleware.startListening({
 });
 
 // Add listener for setHabit to fetch updated habits
-/* listenerMiddleware.startListening({
-  actionCreator: setHabit,
+listenerMiddleware.startListening({
+  actionCreator: setHabit.fulfilled,
   effect: async (action, listenerApi) => {
     console.log("side effect for setHabit, calling fetchHabits", action.payload);
     const state = listenerApi.getState();
@@ -55,7 +55,7 @@ listenerMiddleware.startListening({
       listenerApi.dispatch(fetchHabits(state.auth.user.uid));
     }
   },
-}); */
+}); 
 
 export const store = configureStore({
   reducer: rootReducer,
