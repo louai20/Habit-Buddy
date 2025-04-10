@@ -29,14 +29,13 @@ export function AddHabitView({ user, onSetHabit }) {
 
   const handleSubmit = async () => {
     if (!habitData.name.trim()) {
-      return Alert.alert('Missing name', 'Please enter a habit name.');
+      console.log('AddHabitView: Name is empty');
+      return;
     }
 
     if (habitData.endDate < habitData.startDate) {
-      return Alert.alert(
-        'Invalid dates',
-        'End date cannot be before start date.'
-      );
+      console.log('AddHabitView: End date is before start date');
+      return;
     }
 
     try {
@@ -46,9 +45,11 @@ export function AddHabitView({ user, onSetHabit }) {
         endDate: habitData.endDate.toISOString(),
       };
 
-      await onSetHabit(newHabit, user.uid);
-
-      Alert.alert('Success', 'Habit created!');
+     
+      await onSetHabit(user.uid, newHabit);
+      console.log('AddHabitView: Habit added successfully');
+      
+      // Reset form data
       setHabitData({
         name: '',
         description: '',
@@ -56,9 +57,9 @@ export function AddHabitView({ user, onSetHabit }) {
         startDate: new Date(),
         endDate: new Date(),
       });
+      console.log('AddHabitView: Form data reset');
     } catch (error) {
-      console.error('Error setting habit:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('AddHabitView: Error adding habit:', error);
     }
   };
 
