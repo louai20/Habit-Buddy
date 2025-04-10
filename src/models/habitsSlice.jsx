@@ -52,9 +52,11 @@ export const deleteHabit = createAsyncThunk(
   async ({ userId, habitId }, { getState, rejectWithValue }) => {
     try {
       console.log('SLICE: Delete habit:', habitId);
+      console.log('SLICE: Delete for user userId:', userId);
       const userHabitsDoc = doc(db, DOCUMENT, userId);
 
       const currentHabits = getState().habits.habits;
+      console.log('SLICE: currentHabits:', currentHabits);
 
       if (currentHabits.length === 0) {
         throw new Error('No habits found in the store');
@@ -76,6 +78,41 @@ export const deleteHabit = createAsyncThunk(
   }
 );
 
+export const updateHabit = createAsyncThunk(
+  'habits/updateHabit',
+  async ({ userId, habitId, updatedData }, { getState, rejectWithValue }) => {
+    try {
+
+      console.log("Slice habitId:", habitId);
+      console.log('SLICE: updatedData:', updatedData);
+      console.log("Slice userId:", userId);
+
+      const userHabitsDoc = doc(db, DOCUMENT, userId);
+
+      const currentHabits = getState().habits.habits;
+
+      if (currentHabits.length === 0) {
+        throw new Error('No habits found.');
+      }
+
+
+      const updatedHabits = currentHabits.map(habit =>
+        habit.id === habitId ? { ...habit, ...updatedData } : habit
+      );
+
+      
+      // Firestore update
+      await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
+      console.log('SLICE: updatedHabits');
+
+      return { habitId, updatedData };
+    } catch (error) {
+      console.error('Error updating habit:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 const initialState = {
   habits: [],
@@ -87,12 +124,6 @@ export const habitsSlice = createSlice({
   name: 'habits',
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1;
-    },
-    decrement: (state) => {
-      state.value -= 1;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -117,6 +148,33 @@ export const habitsSlice = createSlice({
         state.habits = state.habits.filter(habit => habit.id !== action.payload);
       })
       .addCase(deleteHabit.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(updateHabit.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateHabit.fulfilled, (state, action) => {
+        state.loading = false;
+        const { habitId, updatedData } = action.payload; // Get habitId and updatedData from action.payload
+
+        // Find the habit in the current state that matches the habitId
+        const habitIndex = state.habits.findIndex((habit) => habit.id === habitId);
+        console.log('habitIndex', habitIndex);
+
+        if (habitIndex !== -1) {
+          console.log('updating in extrareducer');
+          // Update the habit with new data
+          state.habits[habitIndex] = {
+            ...state.habits[habitIndex],
+            ...updatedData,
+          };
+        }
+
+       
+      })
+      .addCase(updateHabit.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

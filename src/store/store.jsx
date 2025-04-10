@@ -17,33 +17,8 @@ const rootReducer = combineReducers({
 // Create middleware
 const listenerMiddleware = createListenerMiddleware();
 
-const saveHabitToFirestore = async (value) => {
-  try {
-    const habitRef = doc(db, 'habits', 'testDocuments');
-    await setDoc(habitRef, { value }, { merge: true });
-  } catch (error) {
-    console.error('Error updating Firestore:', error);
-  }
-};
 
 // Add listeners for actions that change habit state
-listenerMiddleware.startListening({
-  actionCreator: increment,
-  effect: async (action, listenerApi) => {
-    const state = listenerApi.getState();
-    console.log("time to persist habits by middleware:", action.payload, listenerApi.getState());
-    await saveHabitToFirestore(state.habits.value);
-  },
-});
-
-listenerMiddleware.startListening({
-  actionCreator: decrement,
-  effect: async (action, listenerApi) => {
-    const state = listenerApi.getState();
-    console.log("time to persist habits by middleware:", action.payload, listenerApi.getState());
-    await saveHabitToFirestore(state.habits.value);
-  },
-});
 
 // Add listener for setHabit to fetch updated habits
 listenerMiddleware.startListening({

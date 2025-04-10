@@ -31,36 +31,39 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
   };
 
   const handleUpdate = async () => {
+    console.log('VIEW: Updating habit with data:', habitData);
     if (!habitData.name.trim()) {
-      return Alert.alert('Missing name', 'Please enter a habit name.');
+      Alert.alert('EditHabitView: Name is empty');
+      return;
     }
 
     if (habitData.endDate < habitData.startDate) {
-      return Alert.alert(
-        'Invalid dates',
-        'End date cannot be before start date.'
-      );
+      Alert.alert('EditHabitView: End date is before start date');
+      return;
     }
 
     try {
-      const updatedHabit = {
+
+    const updatedHabit = {
         ...habitData,
         startDate: habitData.startDate.toISOString(),
         endDate: habitData.endDate.toISOString(),
-      };
+        };
 
-      await onUpdateHabit(selectedHabit.id, updatedHabit);
+       await onUpdateHabit( {userId: user.uid, 
+         habitId: selectedHabit.id, 
+         updatedData: updatedHabit 
+      });
+      console.log('VIEW: Habit updated successfully!');
       Alert.alert('Success', 'Habit updated successfully!');
     } catch (error) {
-      console.error('Error updating habit:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert('EditHabitView: Error updating habit:', error);
     }
   };
 
   const handleDelete = async (habitId) => {
     try {
-      console.log('VIEW: Deleting habit:', { userId: user.uid, habitId });
-      await onDeleteHabit({ userId: user.uid, habitId });
+      await onDeleteHabit({ userId: user.uid, habitId: habitId });
       if (selectedHabit?.id === habitId) {
         setSelectedHabit(null);
         setHabitData({

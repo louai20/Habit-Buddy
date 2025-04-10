@@ -8,7 +8,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onUpdateHabit: (habitId, habitData) => dispatch(updateHabit({ habitId, habitData })),
+  onUpdateHabit: (userId, habitId, habitData) => dispatch(updateHabit(userId, habitId, habitData)),
   onDeleteHabit: (userid, habitId) => dispatch(deleteHabit(userid, habitId)),
 });
 

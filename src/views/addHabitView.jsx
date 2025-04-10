@@ -46,7 +46,7 @@ export function AddHabitView({ user, onSetHabit }) {
       };
 
      
-      await onSetHabit(user.uid, newHabit);
+      await onSetHabit(newHabit, user.uid);
       console.log('AddHabitView: Habit added successfully');
       
       // Reset form data
