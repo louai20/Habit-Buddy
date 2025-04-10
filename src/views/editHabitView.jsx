@@ -55,7 +55,12 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
          updatedData: updatedHabit 
       });
       console.log('VIEW: Habit updated successfully!');
-      Alert.alert('Success', 'Habit updated successfully!');
+
+      if (Platform.OS === 'web') {
+        window.alert('Success\n\nHabit updated successfully!');
+        } else {
+        Alert.alert('Success', 'Habit updated successfully!');
+        }
     } catch (error) {
       Alert.alert('EditHabitView: Error updating habit:', error);
     }

@@ -48,6 +48,11 @@ export function AddHabitView({ user, onSetHabit }) {
      
       await onSetHabit(newHabit, user.uid);
       console.log('AddHabitView: Habit added successfully');
+      if (Platform.OS === 'web') {
+        window.alert('Success\n\nHabit added successfully!');
+      } else {
+        Alert.alert('Success', 'Habit added successfully!');
+      }
       
       // Reset form data
       setHabitData({
