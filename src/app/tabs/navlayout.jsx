@@ -14,6 +14,7 @@ export default function TabsLayout() {
       <Tab.Navigator
         screenOptions={{
           headerShown: true,
+          style: { justifyContent: 'space-around' }
         }}
       >
         <Tab.Screen
@@ -25,6 +26,14 @@ export default function TabsLayout() {
           }}
         />
         <Tab.Screen
+          name="register"
+          component={RegisterPresenter}
+          options={{
+            tabBarButton: () => null, // Hides the tab
+            headerShown: false,
+          }}
+        />
+        <Tab.Screen
           name="addHabit"
           component={AddHabitPresenter}
           options={{
@@ -33,35 +42,19 @@ export default function TabsLayout() {
           }}
         />
         <Tab.Screen
+          name="login"
+          component={LoginPresenter}
+          options={{
+            tabBarButton: () => null, // Hides the tab
+            headerShown: false,
+          }}
+        />
+        <Tab.Screen
           name="editHabit"
           component={EditHabitPresenter}
           options={{
             title: 'Edit Habit',
             tabBarIcon: () => <Text>✏️</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="motivation"
-          component={MotivationPage}
-          options={{
-            title: 'Motivation',
-            tabBarIcon: () => <Text>💬</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="register"
-          component={RegisterPresenter}
-          options={{
-            title: 'Register',
-            tabBarIcon: () => <Text>📝</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="login"
-          component={LoginPresenter}
-          options={{
-            title: 'Login',
-            tabBarIcon: () => <Text>📝</Text>,
           }}
         />
       </Tab.Navigator>
