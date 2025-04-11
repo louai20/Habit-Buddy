@@ -8,28 +8,30 @@ export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
   async ({ latitude, longitude }) => {
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-    );
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
+    );    
 
     if (!response.ok) {
       throw new Error('Error fetching weather data');
     }
 
     const data = await response.json();
-              // Print the full API response to the console
-              console.log('API Response:', data);
-    return data.current_weather;
+
+    return {
+      current: data.current_weather,
+      forecast: data.daily,
+    };
   }
 );
 
-// Initial state
+//initial state
 const initialState = {
-  weather: null,
+  current: null,
+  forecast: null,
   loading: false,
   error: null,
 };
 
-// Slice to manage weather state
 const weatherSlice = createSlice({
   name: 'weather',
   initialState,
@@ -40,7 +42,8 @@ const weatherSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchWeather.fulfilled, (state, action) => {
-        state.weather = action.payload;
+        state.current = action.payload.current;
+        state.forecast = action.payload.forecast;
         state.loading = false;
       })
       .addCase(fetchWeather.rejected, (state, action) => {

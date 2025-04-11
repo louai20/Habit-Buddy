@@ -10,7 +10,7 @@ export function HabitsView({ habits }) {
   const navigation = useNavigation();
 
   const { quote, loading: quoteLoading, error: quoteError } = useSelector(state => state.quotes);
-  const { weather, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
+  const { current, forecast, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
 
   useEffect(() => {
     dispatch(fetchQuote());
@@ -58,10 +58,23 @@ export function HabitsView({ habits }) {
           <Text style={styles.loading}>Loading weather...</Text>
         ) : weatherError ? (
           <Text style={styles.error}>Weather error: {weatherError}</Text>
-        ) : weather ? (
-          <Text style={styles.weather}>
-            {weather.temperature}°C, Windspeed {weather.windspeed} km/h
-          </Text>
+        ) : current ? (
+          <>
+            <Text style={styles.weather}>{current.temperature}°C, Wind {current.windspeed} km/h</Text>
+            <Text style={styles.sectionTitle}>📅 7-Day Forecast</Text>
+            <View style={styles.forecastContainer}>
+              {forecast?.time?.map((date, index) => (
+                <View key={index} style={styles.forecastItem}>
+                  <Text style={styles.forecastDate}>
+                    {new Date(date).toLocaleDateString(undefined, { weekday: 'short' })}
+                  </Text>
+                  <Text style={styles.forecastTemp}>
+                    {forecast.temperature_2m_min[index]}° / {forecast.temperature_2m_max[index]}°
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </>
         ) : null}
       </View>
 
@@ -126,7 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 10,
   },
-  weather: {
+  current: {
     fontSize: 16,
   },
   habitItem: {
@@ -144,6 +157,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
+  forecast: {
+    fontSize: 14,
+    color: '#333',
+  },  
   loading: {
     fontSize: 14,
     color: '#aaa',
@@ -152,6 +169,28 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
   },
+  forecastContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  forecastItem: {
+    width: '30%',
+    padding: 8,
+    backgroundColor: '#e7f3ff',
+    borderRadius: 6,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  forecastDate: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  forecastTemp: {
+    fontSize: 13,
+    color: '#444',
+  },  
   buttonContainer: {
     marginTop: 20,
     alignItems: 'center',
