@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export function HabitsView({ habits }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const user = useSelector((state) => state.auth.user); // Get username for the header
   const { quote, loading: quoteLoading, error: quoteError } = useSelector(state => state.quotes);
   const { current, forecast, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
 
@@ -31,7 +33,14 @@ export function HabitsView({ habits }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>👋 Welcome Back!</Text>
+      
+      {/* Gradient Header */}
+      <View style={styles.welcomeCard}>
+        <Text style={styles.greeting}>
+          👋 Welcome Back{user?.name ? `, ${user.name}` : ''}!
+        </Text>
+        <Text style={styles.subGreeting}>Let’s make today productive 💪</Text>
+      </View>
 
       {/* Quote Section */}
       <View style={styles.card}>
@@ -114,6 +123,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#1a1a1a',
   },
+  greeting: {
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: 4,
+  },
+  
+  subGreeting: {
+    fontSize: 18,
+    fontWeight: '500',
+    textAlign: 'center',
+    color: '#666',
+  },  
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -142,6 +165,19 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginBottom: 16,
   },
+  welcomeCard: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 30,
+    paddingHorizontal: 24,
+    borderRadius: 18,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 5,
+  },  
   quote: {
     fontSize: 18,
     fontStyle: 'italic',
