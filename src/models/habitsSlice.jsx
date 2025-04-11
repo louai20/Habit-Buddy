@@ -113,6 +113,39 @@ export const updateHabit = createAsyncThunk(
   }
 );
 
+// Async thunk for marking a habit as done today
+export const markHabitAsDone = createAsyncThunk(
+  'habits/markHabitAsDone',
+  async ({ userId, habitId }, { getState, rejectWithValue }) => {
+    try {
+      const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+      const userHabitsDoc = doc(db, DOCUMENT, userId);
+      const currentHabits = getState().habits.habits;
+
+      const updatedHabits = currentHabits.map(habit => {
+        if (habit.id === habitId) {
+          const existing = habit.completedDates || [];
+          const alreadyDone = existing.includes(today);
+
+          return alreadyDone
+            ? habit
+            : {
+                ...habit,
+                completedDates: [...existing, today],
+              };
+        }
+        return habit;
+      });
+
+      await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
+
+      return { habitId, date: today };
+    } catch (error) {
+      console.error('Error marking habit as done:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   habits: [],
@@ -177,7 +210,22 @@ export const habitsSlice = createSlice({
       .addCase(updateHabit.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      });
+      })
+      .addCase(markHabitAsDone.fulfilled, (state, action) => {
+        const { habitId, date } = action.payload;
+        const habit = state.habits.find(h => h.id === habitId);
+        if (habit) {
+          if (!habit.completedDates) {
+            habit.completedDates = [];
+          }
+          if (!habit.completedDates.includes(date)) {
+            habit.completedDates.push(date);
+          }
+        }
+      })
+      .addCase(markHabitAsDone.rejected, (state, action) => {
+        state.error = action.error.message;
+      });      
   }
 });
 

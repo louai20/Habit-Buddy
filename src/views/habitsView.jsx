@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
+import { markHabitAsDone } from '../models/habitsSlice';
 import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Calendar } from 'react-native-calendars';
+import { TouchableOpacity } from 'react-native';
 
 export function HabitsView({ habits }) {
   const dispatch = useDispatch();
@@ -13,6 +15,9 @@ export function HabitsView({ habits }) {
   const user = useSelector((state) => state.auth.user); // Get username for the header
   const { quote, loading: quoteLoading, error: quoteError } = useSelector(state => state.quotes);
   const { current, forecast, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
+  const userHabits = useSelector((state) => state.habits.habits);
+
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     dispatch(fetchQuote());
@@ -30,6 +35,14 @@ export function HabitsView({ habits }) {
       }
     );
   }, [dispatch]);
+
+  const markedDates = {};
+  userHabits?.forEach((habit) => {
+    const completed = habit.completedDates || [];
+    completed.forEach((date) => {
+      markedDates[date] = { marked: true, dotColor: '#00adf5' };
+    });
+  });  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -87,14 +100,41 @@ export function HabitsView({ habits }) {
         ) : null}
       </View>
 
+      {/* 📅 Calendar Section */}
+            <View style={styles.card}>
+        <Text style={styles.sectionTitle}>📆 Habit Calendar</Text>
+        <Calendar
+          style={styles.calendar}
+          markedDates={markedDates}
+          theme={calendarTheme}
+        />
+      </View>
+
       {/* Habits Section */}
       <Text style={styles.sectionTitle}>📋 Your Habits</Text>
-      {habits?.length > 0 ? (
-        habits.map((habit) => (
-          <View key={habit.id} style={styles.habitItem}>
-            <Text style={styles.habitName}>{habit.name}</Text>
-          </View>
-        ))
+      {userHabits?.length > 0 ? (
+        userHabits.map((habit) => {
+          const updatedHabit = userHabits.find(h => h.id === habit.id);
+          const completedDates = updatedHabit?.completedDates || [];          
+          const isDoneToday = completedDates.includes(today);
+
+          return (
+            <View key={habit.id} style={styles.habitItem}>
+              <Text style={styles.habitName}>{habit.name}</Text>
+              <TouchableOpacity
+                style={[styles.doneButton, isDoneToday && styles.doneButtonComplete]}
+                disabled={isDoneToday}
+                onPress={() =>
+                  dispatch(markHabitAsDone({ userId: user.id, habitId: habit.id }))
+                }
+              >
+                <Text style={isDoneToday ? styles.doneTextComplete : styles.doneText}>
+                  {isDoneToday ? '✅ Done' : 'Mark as Done'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })
       ) : (
         <Text style={styles.noHabits}>No habits yet</Text>
       )}
@@ -110,6 +150,18 @@ export function HabitsView({ habits }) {
     </ScrollView>
   );
 }
+
+const calendarTheme = {
+  todayTextColor: '#007bff',
+  dotColor: '#00adf5',
+  arrowColor: '#007bff',
+  monthTextColor: '#333',
+  textDayFontWeight: '500',
+  textMonthFontWeight: '700',
+  textDayFontSize: 16,
+  textMonthFontSize: 18,
+  textDayHeaderFontSize: 14,
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -129,6 +181,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginBottom: 4,
+  },
+  doneButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#28a745', 
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  doneButtonComplete: {
+    backgroundColor: '#cce5ff', 
+  },
+  doneText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  doneTextComplete: {
+    color: '#004085',
+    fontWeight: '600',
   },
   
   subGreeting: {
@@ -221,6 +291,11 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
   },
+  calendar: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 8,
+  },  
   forecastContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
