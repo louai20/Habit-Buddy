@@ -60,7 +60,7 @@ export function HabitsView({ habits }) {
           <Text style={styles.error}>Weather error: {weatherError}</Text>
         ) : current ? (
           <>
-            <Text style={styles.weather}>{current.temperature}°C, Wind {current.windspeed} km/h</Text>
+            <Text style={styles.current}>Temperature {current.temperature}°C, Wind {current.windspeed} km/h</Text>
             <Text style={styles.sectionTitle}>📅 7-Day Forecast</Text>
             <View style={styles.forecastContainer}>
               {forecast?.time?.map((date, index) => (
@@ -108,48 +108,64 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 16,
     textAlign: 'center',
+    color: '#1a1a1a',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    marginBottom: 6,
+    marginBottom: 10,
+    color: '#333',
   },
   buttonWrapper: {
     alignItems: 'center',
     marginTop: 10,
   },
   quoteTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 10,
+    color: '#444',
   },
   card: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+    marginBottom: 16,
   },
   quote: {
-    fontSize: 16,
+    fontSize: 18,
     fontStyle: 'italic',
     textAlign: 'center',
-    marginVertical: 10,
+    marginVertical: 12,
+    color: '#444',
   },
   current: {
-    fontSize: 16,
+    fontSize: 20,    
+    fontWeight: 'bold', 
+    textAlign: 'center',
+    marginBottom: 12,
+    color: '#333',
   },
   habitItem: {
-    backgroundColor: '#e6f7ff',
-    padding: 10,
+    backgroundColor: '#d0ebff',
+    padding: 12,
     marginVertical: 6,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   habitName: {
     fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
   },
   noHabits: {
     fontSize: 16,
@@ -177,11 +193,16 @@ const styles = StyleSheet.create({
   },
   forecastItem: {
     width: '30%',
-    padding: 8,
-    backgroundColor: '#e7f3ff',
-    borderRadius: 6,
+    padding: 10,
+    backgroundColor: '#edf6ff',
+    borderRadius: 10,
     marginBottom: 8,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   forecastDate: {
     fontSize: 14,
