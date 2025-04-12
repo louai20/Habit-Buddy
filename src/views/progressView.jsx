@@ -13,9 +13,17 @@ const Dashboard = () => {
   );
   const dayLabels = last7Days.map((d) => format(new Date(d), "EEE"));
 
-  const dailyCompletion = last7Days.map((date) =>
-    habits.filter((h) => h.completedDates?.includes(date)).length
-  );
+  const dailyCompletion = last7Days.map((date) => {
+    const uniqueHabitCompletions = new Set();
+  
+    habits.forEach((habit) => {
+      if (habit.completedDates?.includes(date)) {
+        uniqueHabitCompletions.add(habit.id); 
+      }
+    });
+  
+    return uniqueHabitCompletions.size;
+  });  
 
   return (
     <ScrollView style={styles.container}>
@@ -42,12 +50,14 @@ const Dashboard = () => {
         <BarChart
           data={{
             labels: dayLabels,
-            datasets: [{ data: dailyCompletion }],
+            datasets: [{ data: dailyCompletion.map(Number) }],
           }}
           width={Dimensions.get("window").width - 40}
           height={220}
           fromZero
           yAxisLabel=""
+          showValuesOnTopOfBars={true}
+          withInnerLines={false}
           chartConfig={{
             backgroundGradientFrom: "#fff",
             backgroundGradientTo: "#fff",

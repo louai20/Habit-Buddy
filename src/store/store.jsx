@@ -19,20 +19,6 @@ const rootReducer = combineReducers({
 const listenerMiddleware = createListenerMiddleware();
 
 // listener for markHabitAsDone to refresh habits
-
-/*
-listenerMiddleware.startListening({
-  actionCreator: markHabitAsDone.fulfilled,
-  effect: async (action, listenerApi) => {
-    const state = listenerApi.getState();
-    const userId = state.auth.user?.uid;
-    if (userId) {
-      listenerApi.dispatch(fetchHabits(userId));
-    }
-  },
-});
-*/
-
 listenerMiddleware.startListening({
   actionCreator: markHabitAsDone.fulfilled,
   effect: async (_, listenerApi) => {

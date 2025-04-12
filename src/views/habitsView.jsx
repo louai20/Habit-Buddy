@@ -154,35 +154,37 @@ export function HabitsView({ habits }) {
       {/* Habits Section */}
       <Text style={styles.sectionTitle}>📋 Your Habits</Text>
       {userHabits?.length > 0 ? (
-        userHabits.map((habit) => {
-          const updatedHabit = userHabits.find(h => h.id === habit.id);
-          const completedDates = updatedHabit?.completedDates || [];          
-          const isDoneToday = localDone[habit.id] ?? completedDates.includes(today);
+        <View style={styles.habitGrid}>
+          {userHabits.map((habit) => {
+            const updatedHabit = userHabits.find(h => h.id === habit.id);
+            const completedDates = updatedHabit?.completedDates || [];          
+            const isDoneToday = localDone[habit.id] ?? completedDates.includes(today);
 
-          return (
-            <View key={habit.id} style={styles.habitItem}>
-              <Text style={styles.habitName}>{habit.name}</Text>
-              <TouchableOpacity
-                style={[styles.doneButton, isDoneToday && styles.doneButtonComplete]}
-                onPress={() => {
-                  const currentlyDone = localDone[habit.id] ?? completedDates.includes(today);
-                
-                  if (currentlyDone) {
-                    dispatch(unmarkHabitAsDone({ userId: user.uid, habitId: habit.id }));
-                    setLocalDone(prev => ({ ...prev, [habit.id]: false }));
-                  } else {
-                    dispatch(markHabitAsDone({ userId: user.uid, habitId: habit.id }));
-                    setLocalDone(prev => ({ ...prev, [habit.id]: true }));
-                  }
-                }}                
-              >
-                <Text style={isDoneToday ? styles.doneTextComplete : styles.doneText}>
-                  {isDoneToday ? '✅ Done' : 'Mark as Done'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })
+            return (
+              <View key={habit.id} style={styles.habitItem}>
+                <Text style={styles.habitName}>{habit.name}</Text>
+                <TouchableOpacity
+                  style={[styles.doneButton, isDoneToday && styles.doneButtonComplete]}
+                  onPress={() => {
+                    const currentlyDone = localDone[habit.id] ?? completedDates.includes(today);
+                  
+                    if (currentlyDone) {
+                      dispatch(unmarkHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                      setLocalDone(prev => ({ ...prev, [habit.id]: false }));
+                    } else {
+                      dispatch(markHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                      setLocalDone(prev => ({ ...prev, [habit.id]: true }));
+                    }
+                  }}                
+                >
+                  <Text style={isDoneToday ? styles.doneTextComplete : styles.doneText}>
+                    {isDoneToday ? '✅ Done' : 'Mark as Done'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
       ) : (
         <Text style={styles.noHabits}>No habits yet</Text>
       )}
@@ -223,6 +225,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#1a1a1a',
   },
+  habitGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  habitItem: {
+    backgroundColor: '#d0ebff',
+    padding: 12,
+    marginVertical: 6,
+    borderRadius: 12,
+    width: '48%', // This makes it 2 columns
+  },  
   greeting: {
     fontSize: 24,
     fontWeight: '700',
@@ -271,7 +285,6 @@ const styles = StyleSheet.create({
     color: '#004085',
     fontWeight: '600',
   },
-  
   subGreeting: {
     fontSize: 18,
     fontWeight: '500',
@@ -332,12 +345,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
     color: '#333',
-  },
-  habitItem: {
-    backgroundColor: '#d0ebff',
-    padding: 12,
-    marginVertical: 6,
-    borderRadius: 12,
   },
   habitName: {
     fontSize: 16,
