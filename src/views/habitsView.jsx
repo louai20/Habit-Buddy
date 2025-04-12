@@ -133,6 +133,21 @@ export function HabitsView({ habits }) {
         </View>
       </View>
 
+      <TouchableOpacity
+        onPress={() => navigation.navigate("progress")}
+        style={{
+          backgroundColor: '#4a90e2',
+          padding: 12,
+          borderRadius: 8,
+          marginVertical: 10,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>
+          📊 View Progress
+        </Text>
+      </TouchableOpacity>
+
       {/* Habits Section */}
       <Text style={styles.sectionTitle}>📋 Your Habits</Text>
       {userHabits?.length > 0 ? (
