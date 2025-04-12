@@ -19,6 +19,13 @@ export function HabitsView({ habits }) {
 
   const today = new Date().toISOString().split('T')[0];
 
+  const completedToday = userHabits.filter(h => h.completedDates?.includes(today)).length;
+  const scheduledToday = userHabits.filter(h => today >= h.startDate && today <= h.endDate).length;
+  const topHabit = userHabits.reduce((top, h) => {
+    const count = h.completedDates?.length || 0;
+    return count > (top.count || 0) ? { name: h.name, count } : top;
+  }, { name: '-', count: 0 });
+
   useEffect(() => {
     dispatch(fetchQuote());
 
@@ -101,13 +108,29 @@ export function HabitsView({ habits }) {
       </View>
 
       {/* 📅 Calendar Section */}
-            <View style={styles.card}>
+      <View style={styles.card}>
         <Text style={styles.sectionTitle}>📆 Habit Calendar</Text>
         <Calendar
           style={styles.calendar}
           markedDates={markedDates}
           theme={calendarTheme}
         />
+      </View>
+
+      {/* Progress Section */}
+      <View style={styles.progressContainer}>
+        <View style={styles.progressCard}>
+          <Text style={styles.progressLabel}>✅ Completed Today</Text>
+          <Text style={styles.progressValue}>{completedToday}</Text>
+        </View>
+        <View style={styles.progressCard}>
+          <Text style={styles.progressLabel}>📅 Scheduled Today</Text>
+          <Text style={styles.progressValue}>{scheduledToday}</Text>
+        </View>
+        <View style={styles.progressCard}>
+          <Text style={styles.progressLabel}>🏆 Top Habit</Text>
+          <Text style={styles.progressValue}>{topHabit.name}</Text>
+        </View>
       </View>
 
       {/* Habits Section */}
@@ -181,6 +204,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginBottom: 4,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  progressCard: {
+    flex: 1,
+    backgroundColor: '#f0f8ff',
+    marginHorizontal: 4,
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  progressLabel: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  progressValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#007bff',
   },
   doneButton: {
     paddingVertical: 8,
