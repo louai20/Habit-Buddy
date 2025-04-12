@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
-import { markHabitAsDone } from '../models/habitsSlice';
+import { markHabitAsDone, unmarkHabitAsDone } from '../models/habitsSlice';
 import { useNavigation } from '@react-navigation/native';
 import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native';
+import { useState } from "react";
 
 export function HabitsView({ habits }) {
   const dispatch = useDispatch();
@@ -18,6 +19,8 @@ export function HabitsView({ habits }) {
   const userHabits = useSelector((state) => state.habits.habits);
 
   const today = new Date().toISOString().split('T')[0];
+
+  const [localDone, setLocalDone] = useState({});
 
   const completedToday = userHabits.filter(h => h.completedDates?.includes(today)).length;
   const scheduledToday = userHabits.filter(h => today >= h.startDate && today <= h.endDate).length;
@@ -154,17 +157,24 @@ export function HabitsView({ habits }) {
         userHabits.map((habit) => {
           const updatedHabit = userHabits.find(h => h.id === habit.id);
           const completedDates = updatedHabit?.completedDates || [];          
-          const isDoneToday = completedDates.includes(today);
+          const isDoneToday = localDone[habit.id] ?? completedDates.includes(today);
 
           return (
             <View key={habit.id} style={styles.habitItem}>
               <Text style={styles.habitName}>{habit.name}</Text>
               <TouchableOpacity
                 style={[styles.doneButton, isDoneToday && styles.doneButtonComplete]}
-                disabled={isDoneToday}
-                onPress={() =>
-                  dispatch(markHabitAsDone({ userId: user.id, habitId: habit.id }))
-                }
+                onPress={() => {
+                  const currentlyDone = localDone[habit.id] ?? completedDates.includes(today);
+                
+                  if (currentlyDone) {
+                    dispatch(unmarkHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                    setLocalDone(prev => ({ ...prev, [habit.id]: false }));
+                  } else {
+                    dispatch(markHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                    setLocalDone(prev => ({ ...prev, [habit.id]: true }));
+                  }
+                }}                
               >
                 <Text style={isDoneToday ? styles.doneTextComplete : styles.doneText}>
                   {isDoneToday ? '✅ Done' : 'Mark as Done'}

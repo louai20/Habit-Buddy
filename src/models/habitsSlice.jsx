@@ -147,6 +147,30 @@ export const markHabitAsDone = createAsyncThunk(
   }
 );
 
+export const unmarkHabitAsDone = createAsyncThunk(
+  "habits/unmarkHabitAsDone",
+  async ({ userId, habitId }, { getState }) => {
+    const userHabitsDoc = doc(db, "users", userId);
+    const currentHabits = getState().habits.habits;
+
+    const updatedHabits = currentHabits.map((habit) => {
+      if (habit.id === habitId) {
+        return {
+          ...habit,
+          completedDates: (habit.completedDates || []).filter(
+            (date) => date !== new Date().toISOString().split("T")[0]
+          ),
+        };
+      }
+      return habit;
+    });
+
+    await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
+
+    return { habitId, updated: updatedHabits.find((h) => h.id === habitId) };
+  }
+);
+
 const initialState = {
   habits: [],
   loading: false,
@@ -184,6 +208,13 @@ export const habitsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(unmarkHabitAsDone.fulfilled, (state, action) => {
+        const { habitId, updated } = action.payload;
+        const index = state.habits.findIndex((h) => h.id === habitId);
+        if (index !== -1) {
+          state.habits[index] = updated;
+        }
+      })             
       .addCase(updateHabit.pending, (state) => {
         state.loading = true;
         state.error = null;
