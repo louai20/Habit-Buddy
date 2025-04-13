@@ -1,7 +1,6 @@
 import { connect } from "react-redux";
 import { updateHabit, deleteHabit } from "../models/habitsSlice";
 import { EditHabitView } from "../views/editHabitView";
-import { useEffect } from "react";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,

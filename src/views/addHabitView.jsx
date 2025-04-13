@@ -68,14 +68,6 @@ export function AddHabitView({ user, onSetHabit }) {
     }
   };
 
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.loginMessage}>You need to log in first</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       {/* Name */}

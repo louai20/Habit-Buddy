@@ -11,6 +11,9 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const AddHabitPresenter = ({ user, onSetHabit }) => {
+  if (!user?.uid) {
+    return <p>Please log in to add habits</p>;
+  }
   return <AddHabitView user={user} onSetHabit={onSetHabit} />;
 };
 
