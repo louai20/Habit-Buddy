@@ -108,7 +108,7 @@ export function AddHabitView({ user, onSetHabit }) {
       {/* Start Date */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>Start Date</Text>
-        {Platform.OS === 'web' ? (
+        { (
           <input
             type="date"
             value={habitData.startDate.toISOString().split('T')[0]}
@@ -117,35 +117,13 @@ export function AddHabitView({ user, onSetHabit }) {
             }
             style={styles.webDateInput}
           />
-        ) : (
-          <>
-            <Pressable
-              style={styles.dateButton}
-              onPress={() => setIsStartPickerOpen(true)}
-            >
-              <Text>{habitData.startDate.toDateString()}</Text>
-            </Pressable>
-            {isStartPickerOpen && (
-              <DateTimePicker
-                value={habitData.startDate}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setIsStartPickerOpen(false);
-                  if (selectedDate) {
-                    handleInputChange('startDate', selectedDate);
-                  }
-                }}
-              />
-            )}
-          </>
-        )}
+        ) }
       </View>
 
       {/* End Date */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>End Date</Text>
-        {Platform.OS === 'web' ? (
+        { (
           <input
             type="date"
             value={habitData.endDate.toISOString().split('T')[0]}
@@ -155,30 +133,7 @@ export function AddHabitView({ user, onSetHabit }) {
             }
             style={styles.webDateInput}
           />
-        ) : (
-          <>
-            <Pressable
-              style={styles.dateButton}
-              onPress={() => setIsEndPickerOpen(true)}
-            >
-              <Text>{habitData.endDate.toDateString()}</Text>
-            </Pressable>
-            {isEndPickerOpen && (
-              <DateTimePicker
-                value={habitData.endDate}
-                mode="date"
-                display="default"
-                minimumDate={habitData.startDate}
-                onChange={(event, selectedDate) => {
-                  setIsEndPickerOpen(false);
-                  if (selectedDate) {
-                    handleInputChange('endDate', selectedDate);
-                  }
-                }}
-              />
-            )}
-          </>
-        )}
+        ) }
       </View>
 
       {/* Submit */}
