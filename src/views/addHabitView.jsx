@@ -6,8 +6,9 @@ import {
   Pressable,
   Alert,
   Platform,
-  StyleSheet
+  StyleSheet,
 } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Input } from 'react-native-elements';
 
 export function AddHabitView({ user, onSetHabit }) {
@@ -44,7 +45,6 @@ export function AddHabitView({ user, onSetHabit }) {
         endDate: habitData.endDate.toISOString(),
       };
 
-     
       await onSetHabit(newHabit, user.uid);
       console.log('AddHabitView: Habit added successfully');
       if (Platform.OS === 'web') {
@@ -52,7 +52,7 @@ export function AddHabitView({ user, onSetHabit }) {
       } else {
         Alert.alert('Success', 'Habit added successfully!');
       }
-      
+
       // Reset form data
       setHabitData({
         name: '',
@@ -61,7 +61,6 @@ export function AddHabitView({ user, onSetHabit }) {
         startDate: new Date(),
         endDate: new Date(),
       });
-      console.log('AddHabitView: Form data reset');
     } catch (error) {
       console.error('AddHabitView: Error adding habit:', error);
     }
@@ -107,7 +106,7 @@ export function AddHabitView({ user, onSetHabit }) {
       {/* Start Date */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>Start Date</Text>
-        { (
+        {Platform.OS === 'web' ? (
           <Input
             type="date"
             value={habitData.startDate.toISOString().split('T')[0]}
@@ -116,13 +115,34 @@ export function AddHabitView({ user, onSetHabit }) {
             }
             style={styles.webDateInput}
           />
-        ) }
+        ) : (
+          <>
+            <Pressable
+              style={styles.dateButton}
+              onPress={() => setIsStartPickerOpen(true)}
+            >
+              <Text style={styles.dateButtonText}>
+                {habitData.startDate.toDateString()}
+              </Text>
+            </Pressable>
+            <DateTimePickerModal
+              isVisible={isStartPickerOpen}
+              mode="date" // 👈 NEW
+              date={habitData.startDate}
+              onConfirm={(date) => {
+                setIsStartPickerOpen(false);
+                handleInputChange('startDate', date);
+              }}
+              onCancel={() => setIsStartPickerOpen(false)}
+            />
+          </>
+        )}
       </View>
 
       {/* End Date */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>End Date</Text>
-        { (
+        {Platform.OS === 'web' ? (
           <Input
             type="date"
             value={habitData.endDate.toISOString().split('T')[0]}
@@ -132,7 +152,29 @@ export function AddHabitView({ user, onSetHabit }) {
             }
             style={styles.webDateInput}
           />
-        ) }
+        ) : (
+          <>
+            <Pressable
+              style={styles.dateButton}
+              onPress={() => setIsEndPickerOpen(true)}
+            >
+              <Text style={styles.dateButtonText}>
+                {habitData.endDate.toDateString()}
+              </Text>
+            </Pressable>
+            <DateTimePickerModal
+              isVisible={isEndPickerOpen}
+              mode="date" // 👈 NEW
+              minimumDate={habitData.startDate}
+              date={habitData.endDate}
+              onConfirm={(date) => {
+                setIsEndPickerOpen(false);
+                handleInputChange('endDate', date);
+              }}
+              onCancel={() => setIsEndPickerOpen(false)}
+            />
+          </>
+        )}
       </View>
 
       {/* Submit */}
@@ -142,7 +184,6 @@ export function AddHabitView({ user, onSetHabit }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     padding: 24,

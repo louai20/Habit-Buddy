@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
 import { markHabitAsDone, unmarkHabitAsDone } from '../models/habitsSlice';
-import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location'; 
 import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native';
 import { useState } from "react";
+import { useNavigation } from '@react-navigation/native';
 
 export function DashboardView({ habits }) {
   const dispatch = useDispatch();
@@ -21,31 +22,46 @@ export function DashboardView({ habits }) {
   const today = new Date().toISOString().split('T')[0];
 
   const [localDone, setLocalDone] = useState({});
-
+  const [locationDenied, setLocationDenied] = useState(false);
   const completedToday = userHabits.filter(h => h.completedDates?.includes(today)).length;
   const scheduledToday = userHabits.filter(h => today >= h.startDate && today <= h.endDate).length;
   const topHabit = userHabits.reduce((top, h) => {
     const count = h.completedDates?.length || 0;
     return count > (top.count || 0) ? { name: h.name, count } : top;
   }, { name: '-', count: 0 });
-
+  const [hasAskedLocationPermission, setHasAskedLocationPermission] = useState(false);
   useEffect(() => {
     dispatch(fetchQuote());
+    
+    if (!hasAskedLocationPermission) {
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setLocationDenied(true);
+          setHasAskedLocationPermission(true); // Mark as asked
+          setLocationError('Location permission not granted.');
+          console.error("Location permission not granted.");
+          return;
+        }
 
-    // Get current location and fetch weather
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        dispatch(fetchWeather({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        }));
-      },
-      (err) => {
-        console.error("Location error:", err.message);
-      }
-    );
-  }, [dispatch]);
-
+        try {
+          let location = await Location.getCurrentPositionAsync({});
+          dispatch(fetchWeather({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }));
+          setLocationDenied(false); // Reset if permission is granted
+          setLocationError('');
+          setHasAskedLocationPermission(true); // Mark as asked
+        } catch (err) {
+          console.error('Error getting location:', err);
+          setLocationDenied(true);
+          setLocationError('Error getting location: ' + err.message);
+          setHasAskedLocationPermission(true); // Mark as asked even if there's an error
+        }
+      })();
+    }
+  }, [dispatch, hasAskedLocationPermission]);
   const markedDates = {};
   userHabits?.forEach((habit) => {
     const completed = habit.completedDates || [];
@@ -53,6 +69,28 @@ export function DashboardView({ habits }) {
       markedDates[date] = { marked: true, dotColor: '#00adf5' };
     });
   });  
+    const handleLocationRequest = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        // Location permission granted, now get the current position
+        let location = await Location.getCurrentPositionAsync({});
+        dispatch(fetchWeather({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        }));
+        setLocationDenied(false); // Reset location denied state
+      } else {
+        setLocationDenied(true); // If permission denied, set state
+        Alert.alert('Permission Denied', 'Location permission is required.');
+      }
+    } catch (err) {
+      // Catch errors, log them and display a message
+      console.error("Error getting location:", err);
+      setLocationDenied(true);
+      Alert.alert('Error', 'Unable to retrieve location. Please try again.');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -88,6 +126,28 @@ export function DashboardView({ habits }) {
         <Text style={styles.sectionTitle}>🌤️ Current Weather</Text>
         {weatherLoading ? (
           <Text style={styles.loading}>Loading weather...</Text>
+        ) : locationDenied ? (
+          <TouchableOpacity onPress={async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status === 'granted') {
+              try {
+                let location = await Location.getCurrentPositionAsync({});
+                dispatch(fetchWeather({
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                }));
+                setLocationDenied(false);
+              } catch (err) {
+                setLocationDenied(true); // Set state for error if location can't be fetched
+              }
+            } else {
+              setLocationDenied(true); // Optionally notify if the permission is still denied
+            }
+          }}>
+            <Text style={styles.permissionPrompt}>
+              📍 Location access needed. Tap here to allow.
+            </Text>
+          </TouchableOpacity>
         ) : weatherError ? (
           <Text style={styles.error}>Weather error: {weatherError}</Text>
         ) : current ? (
@@ -109,7 +169,6 @@ export function DashboardView({ habits }) {
           </>
         ) : null}
       </View>
-
       {/* 📅 Calendar Section */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>📆 Habit Calendar</Text>
