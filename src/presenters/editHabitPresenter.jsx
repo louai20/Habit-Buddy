@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import { updateHabit, deleteHabit } from "../models/habitsSlice";
 import { EditHabitView } from "../views/editHabitView";
+import { useEffect } from "react";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
@@ -13,6 +14,12 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const EditHabitPresenter = ({ user, habits, onUpdateHabit, onDeleteHabit }) => {
+
+  // Check if user is logged in
+  if (!user?.uid) {
+    return <p>Please log in to edit your habits</p>;
+  }
+
   return (
     <EditHabitView
       user={user}
