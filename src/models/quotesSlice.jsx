@@ -7,9 +7,15 @@ export const fetchQuote = createAsyncThunk(
     try {
       // Bust cache with timestamp
       const timestamp = new Date().getTime();
-      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent("https://zenquotes.io/api/random")}&_=${timestamp}`;
+      const url = `https://brfenergi.se/iprog/group/35/${encodeURIComponent("https://zenquotes.io/api/random")}&_=${timestamp}`;
 
-      const response = await fetch(url);
+      const response = await fetch(url,{
+        method: "GET",
+        headers: {
+          "X-DH2642-Key": "3d2a031b4cmsh5cd4e7b939ada54p19f679jsn9a775627d767",
+          "X-DH2642-Group": 35,
+        },
+      });
       if (!response.ok) throw new Error("ZenQuotes fetch failed");
 
       const data = await response.json();
