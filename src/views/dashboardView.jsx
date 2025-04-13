@@ -20,7 +20,7 @@ export function DashboardView({ habits }) {
   const userHabits = useSelector((state) => state.habits.habits);
 
   const today = new Date().toISOString().split('T')[0];
-
+  const [locationError, setLocationError] = useState('');
   const [localDone, setLocalDone] = useState({});
   const [locationDenied, setLocationDenied] = useState(false);
   const completedToday = userHabits.filter(h => h.completedDates?.includes(today)).length;
