@@ -9,7 +9,7 @@ import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native';
 import { useState } from "react";
 
-export function HabitsView({ habits }) {
+export function DashboardView({ habits }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 

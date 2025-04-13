@@ -1,11 +1,9 @@
 import { configureStore, combineReducers, createListenerMiddleware  } from '@reduxjs/toolkit';
-import habitsReducer, { increment, decrement, setHabit, fetchHabits } from '../models/habitsSlice';
+import habitsReducer, { setHabit, fetchHabits } from '../models/habitsSlice';
 import authReducer from '../models/authSlice';
 import weatherReducer from '../models/weatherSlice';
 import quotesReducer from '../models/quotesSlice';
 import { markHabitAsDone, unmarkHabitAsDone} from "../models/habitsSlice";
-import { setDoc, doc } from 'firebase/firestore';
-import { db} from '../firebaseConfig';
 
 // Combine all reducers
 const rootReducer = combineReducers({
@@ -14,6 +12,7 @@ const rootReducer = combineReducers({
   weather: weatherReducer,
   quotes: quotesReducer,
 });
+
 
 // Create middleware
 const listenerMiddleware = createListenerMiddleware();
@@ -35,6 +34,16 @@ listenerMiddleware.startListening({
     const userId = listenerApi.getState().auth.user?.uid;
     if (userId) {
       listenerApi.dispatch(fetchHabits(userId));
+    }
+  },
+})
+
+listenerMiddleware.startListening({
+  actionCreator: setHabit.fulfilled,
+  effect: async (_, listenerApi) => {
+    console.log("side effect for setHabit, calling fetchHabits", action.payload);
+    if (state.auth.user?.uid) {
+      listenerApi.dispatch(fetchHabits(state.auth.user.uid));
     }
   },
 })

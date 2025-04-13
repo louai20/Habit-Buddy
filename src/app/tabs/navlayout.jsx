@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-import HabitsPresenter from '../../presenters/habitsPresenter';
+import DashboardPresenter from  '../../presenters/dashboardPresenter'
 import RegisterPresenter from '../../presenters/registerPresenter';
 import LoginPresenter from '../../presenters/loginPresenter';
 import MotivationPage from '../../components/MotivationPage';
@@ -19,10 +19,10 @@ export default function TabsLayout() {
         }}
       >
         <Tab.Screen
-          name="habits"
-          component={HabitsPresenter}
+          name="dashboard"
+          component={DashboardPresenter}
           options={{
-            title: 'Habits',
+            title: 'Dashboard',
             tabBarIcon: () => <Text>📊</Text>,
           }}
         />

@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { fetchHabits, setHabit } from "../models/habitsSlice";
+import { setHabit } from "../models/habitsSlice";
 import { AddHabitView } from "../views/addHabitView";
 
 const mapStateToProps = (state) => ({

@@ -1,7 +1,7 @@
 // Presenter: HabitsPresenter.js
 import { connect } from "react-redux";
-import { HabitsView } from "../views/habitsView";
-import { fetchHabits, setHabit, increment, decrement } from "../models/habitsSlice";
+import { DashboardView} from "../views/dashboardView";
+import { fetchHabits } from "../models/habitsSlice";
 import { useEffect } from "react";
 
 const mapStateToProps = (state) => ({
@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch) => ({
   onFetchHabits: (userId) => dispatch(fetchHabits(userId)),
 });
 
-const HabitsPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
+const DashboardPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
   console.log("rendering habits presenter with user", user);
   useEffect(() => {
     if (user?.uid) {
@@ -29,8 +29,8 @@ const HabitsPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
   }
 
   // Return the HabitsView component with the necessary props
-  return <HabitsView habits={habits} loading={loading} error={error} />;
+  return <DashboardView habits={habits} loading={loading} error={error} />;
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HabitsPresenter);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardPresenter);
 
