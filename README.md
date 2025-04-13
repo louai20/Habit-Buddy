@@ -1,3 +1,5 @@
+# HABIT-BUDDY APP
+
 ### Installation
 
 1. Clone the repository:
@@ -24,7 +26,7 @@ yarn dev
 ```
 
 
-# Habit-Buddy
+# Description
 
 A habit tracking application built with React Native that helps users create, maintain, and track their habits.
 
@@ -45,14 +47,14 @@ A habit tracking application built with React Native that helps users create, ma
 
 ## Planned Features
 
-- [ ] Progress Tracking
-  - Progress visualization for each habit
+- Progress Tracking
+  -> Progress visualization for each habit
 
-- [ ] Social Features
-  - Share habits with friends
+- Social Features
+  -> Share habits with friends
 
-- [ ] User Experience
-  - UI improvements for a better user experience
+- User Experience
+  -> UI improvements for a better user experience
 
 ## Project Structure
 
