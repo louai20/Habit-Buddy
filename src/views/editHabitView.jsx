@@ -31,7 +31,6 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
   };
 
   const handleUpdate = async () => {
-    console.log('VIEW: Updating habit with data:', habitData);
     if (!habitData.name.trim()) {
       Alert.alert('EditHabitView: Name is empty');
       return;
@@ -298,10 +297,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.04,
+    boxShadowRadius: 3,
+    boxShadowOffset: { width: 0, height: 2 },
   },
   selectedHabitItem: {
     borderColor: '#3b82f6',
@@ -364,10 +363,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.04,
+    boxShadowRadius: 3,
+    boxShadowOffset: { width: 0, height: 2 },
   },
   textArea: {
     height: 100,
@@ -378,10 +377,10 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.04,
+    boxShadowRadius: 3,
+    boxShadowOffset: { width: 0, height: 2 },
   },
   webDateInput: {
     padding: 14,
@@ -402,10 +401,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginHorizontal: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.1,
+    boxShadowRadius: 6,
+    boxShadowOffset: { width: 0, height: 4 },
   },
   updateButton: {
     backgroundColor: '#3b82f6',

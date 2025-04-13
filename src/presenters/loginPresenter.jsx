@@ -9,7 +9,7 @@ const LoginPresenter = ({ login, loading, error, user, navigation }) => {
   useEffect(() => {
     // If user is already logged in, redirect to habits page
     if (user) {
-      navigation.navigate('habits'); // Navigate to the habits page
+      navigation.navigate('dashboard'); // Navigate to the habits page
     }
   }, [user, navigation]);
 

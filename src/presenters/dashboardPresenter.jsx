@@ -16,7 +16,6 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const DashboardPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
-  console.log("rendering habits presenter with user", user);
   useEffect(() => {
     if (user?.uid) {
       onFetchHabits(user.uid); // Fetch habits if user ID is available

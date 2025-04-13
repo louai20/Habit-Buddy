@@ -9,10 +9,8 @@ export const fetchHabits = createAsyncThunk(
   'habits/fetchHabits',
   async (userId, { rejectWithValue }) => {
     try {
-      console.log(`Fetching habits for user: ${userId}`);
       const docSnapshot = await getDoc(doc(db, DOCUMENT, userId));
       if (docSnapshot.exists()) {
-        console.log("habits found", docSnapshot.data());
         return docSnapshot.data(); 
       } else {
         return rejectWithValue('Habit not found'); 
@@ -40,7 +38,6 @@ export const setHabit = createAsyncThunk(
         habits: arrayUnion(newHabit)
       }, { merge: true });
   
-      console.log('Habit successfully added:', newHabit);
     } catch (error) {
       console.error('Error adding habit:', error);
     }
@@ -51,12 +48,9 @@ export const deleteHabit = createAsyncThunk(
   'habits/deleteHabit',
   async ({ userId, habitId }, { getState, rejectWithValue }) => {
     try {
-      console.log('SLICE: Delete habit:', habitId);
-      console.log('SLICE: Delete for user userId:', userId);
       const userHabitsDoc = doc(db, DOCUMENT, userId);
 
       const currentHabits = getState().habits.habits;
-      console.log('SLICE: currentHabits:', currentHabits);
 
       if (currentHabits.length === 0) {
         throw new Error('No habits found in the store');
@@ -83,12 +77,7 @@ export const updateHabit = createAsyncThunk(
   async ({ userId, habitId, updatedData }, { getState, rejectWithValue }) => {
     try {
 
-      console.log("Slice habitId:", habitId);
-      console.log('SLICE: updatedData:', updatedData);
-      console.log("Slice userId:", userId);
-
       const userHabitsDoc = doc(db, DOCUMENT, userId);
-
       const currentHabits = getState().habits.habits;
 
       if (currentHabits.length === 0) {
@@ -103,7 +92,6 @@ export const updateHabit = createAsyncThunk(
       
       // Firestore update
       await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
-      console.log('SLICE: updatedHabits');
 
       return { habitId, updatedData };
     } catch (error) {
@@ -225,10 +213,8 @@ export const habitsSlice = createSlice({
 
         // Find the habit in the current state that matches the habitId
         const habitIndex = state.habits.findIndex((habit) => habit.id === habitId);
-        console.log('habitIndex', habitIndex);
 
         if (habitIndex !== -1) {
-          console.log('updating in extrareducer');
           // Update the habit with new data
           state.habits[habitIndex] = {
             ...state.habits[habitIndex],

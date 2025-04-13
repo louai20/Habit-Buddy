@@ -11,11 +11,10 @@ const AuthPresenter = ({ user, loading, error, onLogout, onSetUser }) => {
     const checkUser = async () => {
       try {
         const uidFromStorage = await AsyncStorage.getItem('uid');
-        console.log("uidFromStorage:", uidFromStorage); // Debugging uid retrieval
 
         if (uidFromStorage) {
           const userDoc = await getDoc(doc(db, 'users', uidFromStorage));
-          console.log('User document data:', userDoc.data()); // Log Firestore data
+        
 
           if (userDoc.exists()) {
             const userData = userDoc.data();

@@ -42,7 +42,6 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setHabit.fulfilled,
   effect: async (action, listenerApi) => {
-    console.log("side effect for setHabit, calling fetchHabits", action.payload);
     const state = listenerApi.getState();
     if (state.auth.user?.uid) {
       listenerApi.dispatch(fetchHabits(state.auth.user.uid));
