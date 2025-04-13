@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import { setHabit } from "../models/habitsSlice";
 import { AddHabitView } from "../views/addHabitView";
+import {Text} from "react-native";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user
@@ -12,7 +13,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const AddHabitPresenter = ({ user, onSetHabit }) => {
   if (!user?.uid) {
-    return <p>Please log in to add habits</p>;
+    return <Text>Please log in to add habits</Text>;
   }
   return <AddHabitView user={user} onSetHabit={onSetHabit} />;
 };
