@@ -6,8 +6,9 @@ import {
   Pressable,
   Alert,
   Platform,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
+import { Input } from 'react-native-elements';
 
 export function AddHabitView({ user, onSetHabit }) {
   const [habitData, setHabitData] = useState({
@@ -107,7 +108,7 @@ export function AddHabitView({ user, onSetHabit }) {
       <View style={styles.formGroup}>
         <Text style={styles.label}>Start Date</Text>
         { (
-          <input
+          <Input
             type="date"
             value={habitData.startDate.toISOString().split('T')[0]}
             onChange={(e) =>
@@ -122,7 +123,7 @@ export function AddHabitView({ user, onSetHabit }) {
       <View style={styles.formGroup}>
         <Text style={styles.label}>End Date</Text>
         { (
-          <input
+          <Input
             type="date"
             value={habitData.endDate.toISOString().split('T')[0]}
             min={habitData.startDate.toISOString().split('T')[0]}
