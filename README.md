@@ -56,6 +56,34 @@ A habit tracking application built with React Native that helps users create, ma
 - User Experience
   -> UI improvements for a better user experience
 
+## Issues need to be fixed
+
+1.Location Access for Weather (Mobile)
+
+  - Fix the location-related issue in the weather feature on mobile.
+
+  - Ensure no useEffect or any other logic in the View layer that violates the MVP pattern.
+
+2.DashboardView Refactor
+
+  - Refactor DashboardView so that useEffect, useState, and similar logic are handled in the Presenter layer, not in the View.
+
+3.Habits Feature (Edit and Add)
+
+  - Rewrite both Edit and Add Habit functionality to follow the MVP pattern correctly.
+
+  - Ensure there is no logic (like state or effects) in the View layer.
+
+4.Edit Habit View Issue on Mobile
+
+  - The edit screen does not display correctly on phones.
+
+  - Replace the current date input with DateTimePickerModal from react-native-modal-datetime-picker for better mobile support.
+
+5.Web – Date Deletion Error
+
+  - Fix the issue where deleting a date on the web causes an error.
+
 ## Project Structure
 
 - _layout.jsx
