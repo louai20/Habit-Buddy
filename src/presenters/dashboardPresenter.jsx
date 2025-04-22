@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { DashboardView} from "../views/dashboardView";
 import { fetchHabits } from "../models/habitsSlice";
 import { useEffect } from "react";
-import {Text} from "react-native";
+import { UnauthorizedView } from "../views/unauthorizedView";
 
 const mapStateToProps = (state) => ({
   habits: state.habits.habits,
@@ -25,7 +25,7 @@ const DashboardPresenter = ({ user, onFetchHabits, habits, loading, error }) => 
 
   // Check if user is logged in
   if (!user?.uid) {
-    return <Text>Please log in to see your habits</Text>;
+    return <UnauthorizedView />
   }
 
   // Return the HabitsView component with the necessary props

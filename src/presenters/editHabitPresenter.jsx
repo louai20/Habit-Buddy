@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import { updateHabit, deleteHabit } from "../models/habitsSlice";
 import { EditHabitView } from "../views/editHabitView";
-import {Text} from "react-native";
+import { UnauthorizedView } from "../views/unauthorizedView";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
@@ -17,7 +17,7 @@ const EditHabitPresenter = ({ user, habits, onUpdateHabit, onDeleteHabit }) => {
 
   // Check if user is logged in
   if (!user?.uid) {
-    return <Text>Please log in to edit your habits</Text>;
+    return <UnauthorizedView />
   }
 
   return (
