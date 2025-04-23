@@ -7,6 +7,7 @@ import {
   Alert,
   Platform,
   StyleSheet,
+  Picker,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Input } from 'react-native-elements';
@@ -18,7 +19,7 @@ export function AddHabitView({ user, onSetHabit }) {
   const [habitData, setHabitData] = useState({
     name: '',
     description: '',
-    frequency: '',
+    frequency: 'daily', // Set default value
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -99,12 +100,17 @@ export function AddHabitView({ user, onSetHabit }) {
       {/* Frequency */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>Frequency</Text>
-        <TextInput
-          style={styles.input}
-          value={habitData.frequency}
-          onChangeText={(text) => handleInputChange('frequency', text)}
-          placeholder="e.g., Daily, Weekly"
-        />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={habitData.frequency}
+            style={styles.picker}
+            onValueChange={(value) => handleInputChange('frequency', value)}
+          >
+            <Picker.Item label="Daily" value="Daily" />
+            <Picker.Item label="Weekly" value="Weekly" />
+            <Picker.Item label="Monthly" value="Monthly" />
+          </Picker>
+        </View>
       </View>
 
       {/* Start Date */}

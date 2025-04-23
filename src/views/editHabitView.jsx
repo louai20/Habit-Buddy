@@ -9,6 +9,7 @@ import {
   Platform,
   StyleSheet,
   ScrollView,
+  Picker,
 } from 'react-native';
 import { Input } from 'react-native-elements';
 
@@ -139,12 +140,17 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             {/* Frequency */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Frequency</Text>
-              <TextInput
-                style={styles.input}
-                value={habitData.frequency}
-                onChangeText={(text) => handleInputChange('frequency', text)}
-                placeholder="e.g., Daily, Weekly"
-              />
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={habitData.frequency}
+                  style={styles.picker}
+                  onValueChange={(value) => handleInputChange('frequency', value)}
+                >
+                  <Picker.Item label="Daily" value="Daily" />
+                  <Picker.Item label="Weekly" value="Weekly" />
+                  <Picker.Item label="Monthly" value="Monthly" />
+                </Picker>
+              </View>
             </View>
 
             {/* Start Date */}
