@@ -10,8 +10,11 @@ import {
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Input } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 
 export function AddHabitView({ user, onSetHabit }) {
+  const navigation = useNavigation();
+  
   const [habitData, setHabitData] = useState({
     name: '',
     description: '',
@@ -61,6 +64,7 @@ export function AddHabitView({ user, onSetHabit }) {
         startDate: new Date(),
         endDate: new Date(),
       });
+      navigation.navigate('habit');
     } catch (error) {
       console.error('AddHabitView: Error adding habit:', error);
     }

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -7,19 +8,36 @@ import {
   Alert,
   Platform,
   StyleSheet,
-  FlatList,
   ScrollView,
 } from 'react-native';
 import { Input } from 'react-native-elements';
 
 export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
-  const [selectedHabit, setSelectedHabit] = useState(null);
+  const route = useRoute();
+  const navigation = useNavigation();
+  const habitFromRoute = route.params?.habit;
+
+  // Add useEffect to update form when navigation params change
+  useEffect(() => {
+    if (habitFromRoute) {
+      setSelectedHabit(habitFromRoute);
+      setHabitData({
+        name: habitFromRoute.name || '',
+        description: habitFromRoute.description || '',
+        frequency: habitFromRoute.frequency || '',
+        startDate: new Date(habitFromRoute.startDate),
+        endDate: new Date(habitFromRoute.endDate),
+      });
+    }
+  }, [route.params]); // Listen to route params changes
+
+  const [selectedHabit, setSelectedHabit] = useState(habitFromRoute);
   const [habitData, setHabitData] = useState({
-    name: '',
-    description: '',
-    frequency: '',
-    startDate: new Date(),
-    endDate: new Date(),
+    name: habitFromRoute?.name || '',
+    description: habitFromRoute?.description || '',
+    frequency: habitFromRoute?.frequency || '',
+    startDate: new Date(habitFromRoute?.startDate) || new Date(),
+    endDate: new Date(habitFromRoute?.endDate) || new Date(),
   });
 
   const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
@@ -59,6 +77,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
         } else {
         Alert.alert('Success', 'Habit updated successfully!');
         }
+        navigation.navigate('habit'); 
     } catch (error) {
       Alert.alert('EditHabitView: Error updating habit:', error);
     }
@@ -82,51 +101,9 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
     }
   };
 
-  const handleSelectHabit = (habit) => {
-    setSelectedHabit(habit);
-    setHabitData({
-      name: habit.name || '',
-      description: habit.description || '',
-      frequency: habit.frequency || '',
-      startDate: new Date(habit.startDate) || new Date(),
-      endDate: new Date(habit.endDate) || new Date(),
-    });
-  };
-
-  const renderHabitItem = ({ item }) => (
-    <Pressable
-      style={[
-        styles.habitItem,
-        selectedHabit?.id === item.id && styles.selectedHabitItem
-      ]}
-      onPress={() => handleSelectHabit(item)}
-    >
-      <Text style={styles.habitName}>{item.name}</Text>
-      <Text style={styles.habitDescription}>{item.description}</Text>
-      <Text style={styles.habitFrequency}>Frequency: {item.frequency}</Text>
-      <View style={styles.habitDates}>
-        <Text style={styles.dateText}>
-          Start: {new Date(item.startDate).toLocaleDateString()}
-        </Text>
-        <Text style={styles.dateText}>
-          End: {new Date(item.endDate).toLocaleDateString()}
-        </Text>
-      </View>
-    </Pressable>
-  );
 
   return (
     <View style={styles.container}>
-        {/*List of Habits*/}
-      <View style={styles.listContainer}>
-        <Text style={styles.title}>Your Habits</Text>
-        <FlatList
-          data={habits}
-          renderItem={renderHabitItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-        />
-      </View>
 
       {/*Form to edit the selected habit*/}
       <View style={styles.formContainer}>
@@ -381,4 +358,4 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-}); 
+});

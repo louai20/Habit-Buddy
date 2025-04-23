@@ -25,7 +25,7 @@ export function HabitView({ user, habits, onDeleteHabit }) {
       <View style={styles.buttonContainer}>
         <Pressable 
           style={styles.editButton}
-          onPress={() => navigation.navigate('editHabit')}
+          onPress={() => navigation.navigate('editHabit', { habit: item })}
         >
           <Text style={styles.buttonText}>Edit</Text>
         </Pressable>
