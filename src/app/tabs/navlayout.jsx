@@ -7,6 +7,7 @@ import MotivationPage from '../../components/MotivationPage';
 import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import ProgressPresenter from "../../presenters/progressPresenter";
+import HabitPresenter from "../../presenters/habitPresenter";
 
 const Tab = createBottomTabNavigator();
 
@@ -39,6 +40,15 @@ export default function TabsLayout() {
           component={AddHabitPresenter}
           options={{
             title: 'Add Habit',
+            //tabBarIcon: () => <Text>📝</Text>,
+            tabBarButton: () => null, // Hides the tab
+          }}
+        />
+        <Tab.Screen
+          name="habit"
+          component={HabitPresenter}
+          options={{
+            title: 'Habit',
             tabBarIcon: () => <Text>📝</Text>,
           }}
         />
@@ -55,7 +65,8 @@ export default function TabsLayout() {
           component={EditHabitPresenter}
           options={{
             title: 'Edit Habit',
-            tabBarIcon: () => <Text>✏️</Text>,
+            //tabBarIcon: () => <Text>✏️</Text>,
+            tabBarButton: () => null,
           }}
         />
         <Tab.Screen
