@@ -41,6 +41,8 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
     endDate: new Date(habitFromRoute?.endDate) || new Date(),
   });
 
+  const [startDateInput, setStartDateInput] = useState(habitData.startDate.toISOString().split('T')[0]);
+  const [endDateInput, setEndDateInput] = useState(habitData.endDate.toISOString().split('T')[0]);
   const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
   const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
 
@@ -50,12 +52,35 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
 
   const handleUpdate = async () => {
     if (!habitData.name.trim()) {
-      Alert.alert('EditHabitView: Name is empty');
+      if (Platform.OS === 'web') {
+        window.alert('Empty name');
+      } else {
+        Alert.alert('Empty name');
+      }
       return;
     }
 
-    if (habitData.endDate < habitData.startDate) {
-      Alert.alert('EditHabitView: End date is before start date');
+    const isValidDate = (str) => /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(new Date(str).getTime());
+
+    if (!isValidDate(startDateInput) || !isValidDate(endDateInput)) {
+      if (Platform.OS === 'web') {
+        window.alert('Invalid Date');
+      } else {
+        Alert.alert('Invalid Date');
+      }
+      return;
+    }
+
+
+    const startDate = new Date(startDateInput);
+    const endDate = new Date(endDateInput);
+  
+    if (endDate < startDate) {
+      if (Platform.OS === 'web') {
+        window.alert('End date cannot be before start date.');
+      } else {
+        Alert.alert('End date cannot be before start date.');
+      }
       return;
     }
 
@@ -63,8 +88,8 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
 
     const updatedHabit = {
         ...habitData,
-        startDate: habitData.startDate.toISOString(),
-        endDate: habitData.endDate.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         };
 
        await onUpdateHabit( {userId: user.uid, 
@@ -159,10 +184,8 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
               {(
                 <Input
                   type="date"
-                  value={habitData.startDate.toISOString().split('T')[0]}
-                  onChange={(e) =>
-                    handleInputChange('startDate', new Date(e.target.value))
-                  }
+                  value={startDateInput}
+                  onChange={(e) => setStartDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
               )}
@@ -174,11 +197,8 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
               {(
                 <Input
                   type="date"
-                  value={habitData.endDate.toISOString().split('T')[0]}
-                  min={habitData.startDate.toISOString().split('T')[0]}
-                  onChange={(e) =>
-                    handleInputChange('endDate', new Date(e.target.value))
-                  }
+                  value={endDateInput}
+                  onChange={(e) => setEndDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
               )}
