@@ -156,7 +156,7 @@ export function AddHabitView({ user, onSetHabit }) {
               onPress={() => setIsStartPickerOpen(true)}
             >
               <Text style={styles.dateButtonText}>
-                {habitData.startDate.toDateString()}
+                {startDateInput}
               </Text>
             </Pressable>
             <DateTimePickerModal
@@ -165,7 +165,7 @@ export function AddHabitView({ user, onSetHabit }) {
               date={habitData.startDate}
               onConfirm={(date) => {
                 setIsStartPickerOpen(false);
-                handleInputChange('startDate', date);
+                setStartDateInput(date);
               }}
               onCancel={() => setIsStartPickerOpen(false)}
             />
@@ -190,7 +190,7 @@ export function AddHabitView({ user, onSetHabit }) {
               onPress={() => setIsEndPickerOpen(true)}
             >
               <Text style={styles.dateButtonText}>
-                {habitData.endDate.toDateString()}
+                {endDateInput}
               </Text>
             </Pressable>
             <DateTimePickerModal
@@ -200,7 +200,7 @@ export function AddHabitView({ user, onSetHabit }) {
               date={habitData.endDate}
               onConfirm={(date) => {
                 setIsEndPickerOpen(false);
-                handleInputChange('endDate', date);
+                setEndDateInput(date);
               }}
               onCancel={() => setIsEndPickerOpen(false)}
             />
