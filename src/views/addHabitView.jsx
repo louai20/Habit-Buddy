@@ -7,11 +7,11 @@ import {
   Alert,
   Platform,
   StyleSheet,
-  Picker,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Input } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import { SelectList } from 'react-native-dropdown-select-list';
 
 export function AddHabitView({ user, onSetHabit }) {
   const navigation = useNavigation();
@@ -19,7 +19,7 @@ export function AddHabitView({ user, onSetHabit }) {
   const [habitData, setHabitData] = useState({
     name: '',
     description: '',
-    frequency: 'daily', // Set default value
+    frequency: 'Daily', // Set default value
     startDate: new Date(),
     endDate: new Date(),
   });
@@ -91,7 +91,7 @@ export function AddHabitView({ user, onSetHabit }) {
         startDate: new Date(),
         endDate: new Date(),
       });
-      navigation.navigate('habit');
+      navigation.navigate('dashboard');
     } catch (error) {
       console.error('AddHabitView: Error adding habit:', error);
     }
@@ -126,17 +126,25 @@ export function AddHabitView({ user, onSetHabit }) {
       {/* Frequency */}
       <View style={styles.formGroup}>
         <Text style={styles.label}>Frequency</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={habitData.frequency}
-            style={styles.picker}
-            onValueChange={(value) => handleInputChange('frequency', value)}
-          >
-            <Picker.Item label="Daily" value="Daily" />
-            <Picker.Item label="Weekly" value="Weekly" />
-            <Picker.Item label="Monthly" value="Monthly" />
-          </Picker>
-        </View>
+        <SelectList
+          setSelected={(value) => handleInputChange('frequency', value)}
+          data={[
+            {key: 'Daily', value: 'Daily'},
+            {key: 'Weekly', value: 'Weekly'},
+            {key: 'Monthly', value: 'Monthly'},
+          ]}
+          save="value"
+          defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
+          search={false}
+          boxStyles={styles.selectBox}
+          dropdownStyles={styles.dropdownContainer}
+          dropdownItemStyles={styles.dropdownItem}
+          dropdownTextStyles={styles.dropdownText}
+          inputStyles={styles.selectInput}
+          onFocus={() => {
+            // Add focus effect if needed
+          }}
+        />
       </View>
 
       {/* Start Date */}
@@ -161,7 +169,7 @@ export function AddHabitView({ user, onSetHabit }) {
             </Pressable>
             <DateTimePickerModal
               isVisible={isStartPickerOpen}
-              mode="date" // 👈 NEW
+              mode="date" 
               date={habitData.startDate}
               onConfirm={(date) => {
                 setIsStartPickerOpen(false);
@@ -297,5 +305,50 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     marginTop: 50,
+  },
+  selectBox: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.04,
+    boxShadowRadius: 3,
+    boxShadowOffset: { width: 0, height: 2 },
+    cursor: 'pointer', // Add cursor pointer for web
+  },
+  selectInput: {
+    color: '#374151',
+    fontSize: 16,
+    ':hover': {
+      color: '#1f2937',
+    },
+  },
+  dropdownContainer: {
+    backgroundColor: '#fff',
+    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    marginTop: 5,
+    borderRadius: 12,
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.1,
+    boxShadowRadius: 4,
+    boxShadowOffset: { width: 0, height: 2 },
+  },
+  dropdownItem: {
+    borderBottomColor: '#e5e7eb',
+    borderBottomWidth: 1,
+    padding: 12,
+    ':hover': {
+      backgroundColor: '#f3f4f6',
+    },
+    cursor: 'pointer', // Add cursor pointer for web
+  },
+  dropdownText: {
+    color: '#374151',
+    fontSize: 16,
   },
 });

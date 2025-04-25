@@ -9,9 +9,9 @@ import {
   Platform,
   StyleSheet,
   ScrollView,
-  Picker,
 } from 'react-native';
 import { Input } from 'react-native-elements';
+import { SelectList } from 'react-native-dropdown-select-list';
 
 export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
   const route = useRoute();
@@ -165,17 +165,21 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             {/* Frequency */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Frequency</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={habitData.frequency}
-                  style={styles.picker}
-                  onValueChange={(value) => handleInputChange('frequency', value)}
-                >
-                  <Picker.Item label="Daily" value="Daily" />
-                  <Picker.Item label="Weekly" value="Weekly" />
-                  <Picker.Item label="Monthly" value="Monthly" />
-                </Picker>
-              </View>
+              <SelectList
+                setSelected={(value) => handleInputChange('frequency', value)}
+                data={[
+                  {key: 'Daily', value: 'Daily'},
+                  {key: 'Weekly', value: 'Weekly'},
+                  {key: 'Monthly', value: 'Monthly'},
+                ]}
+                save="value"
+                defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
+                search={false}
+                boxStyles={styles.selectBox}
+                dropdownStyles={styles.dropdownContainer}
+                dropdownItemStyles={styles.dropdownItem}
+                dropdownTextStyles={styles.dropdownText}
+              />
             </View>
 
             {/* Start Date */}
@@ -383,5 +387,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  selectInput: {
+    color: '#374151',
+    fontSize: 16,
+    ':hover': {
+      color: '#1f2937',
+    },
+  },
+  dropdownContainer: {
+    backgroundColor: '#fff',
+    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    marginTop: 5,
+    borderRadius: 12,
+    boxShadowColor: '#000',
+    boxShadowOpacity: 0.1,
+    boxShadowRadius: 4,
+    boxShadowOffset: { width: 0, height: 2 },
+  },
+  dropdownItem: {
+    borderBottomColor: '#e5e7eb',
+    borderBottomWidth: 1,
+    padding: 12,
+    ':hover': {
+      backgroundColor: '#f3f4f6',
+    },
+    cursor: 'pointer', // Add cursor pointer for web
+  },
+  dropdownText: {
+    color: '#374151',
+    fontSize: 16,
   },
 });
