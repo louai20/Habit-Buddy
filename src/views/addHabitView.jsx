@@ -7,6 +7,7 @@ import {
   Alert,
   Platform,
   StyleSheet,
+  ScrollView,  // Add this import
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Input } from 'react-native-elements';
@@ -99,127 +100,129 @@ export function AddHabitView({ user, onSetHabit }) {
 
   return (
     <View style={styles.container}>
-      {/* Name */}
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Habit Name</Text>
-        <TextInput
-          style={styles.input}
-          value={habitData.name}
-          onChangeText={(text) => handleInputChange('name', text)}
-          placeholder="e.g., Meditate"
-        />
-      </View>
-
-      {/* Description */}
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          value={habitData.description}
-          onChangeText={(text) => handleInputChange('description', text)}
-          placeholder="What is this habit about?"
-          multiline
-          numberOfLines={4}
-        />
-      </View>
-
-      {/* Frequency */}
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Frequency</Text>
-        <SelectList
-          setSelected={(value) => handleInputChange('frequency', value)}
-          data={[
-            {key: 'Daily', value: 'Daily'},
-            {key: 'Weekly', value: 'Weekly'},
-            {key: 'Monthly', value: 'Monthly'},
-          ]}
-          save="value"
-          defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
-          search={false}
-          boxStyles={styles.selectBox}
-          dropdownStyles={styles.dropdownContainer}
-          dropdownItemStyles={styles.dropdownItem}
-          dropdownTextStyles={styles.dropdownText}
-          inputStyles={styles.selectInput}
-          onFocus={() => {
-            // Add focus effect if needed
-          }}
-        />
-      </View>
-
-      {/* Start Date */}
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Start Date</Text>
-        {Platform.OS === 'web' ? (
-          <Input
-            type="date"
-            value={startDateInput}
-            onChange={(e) => setStartDateInput(e.target.value)}
-            style={styles.webDateInput}
+      <ScrollView>
+        {/* Name */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Habit Name</Text>
+          <TextInput
+            style={styles.input}
+            value={habitData.name}
+            onChangeText={(text) => handleInputChange('name', text)}
+            placeholder="e.g., Meditate"
           />
-        ) : (
-          <>
-            <Pressable
-              style={styles.dateButton}
-              onPress={() => setIsStartPickerOpen(true)}
-            >
-              <Text style={styles.dateButtonText}>
-                {startDateInput}
-              </Text>
-            </Pressable>
-            <DateTimePickerModal
-              isVisible={isStartPickerOpen}
-              mode="date" 
-              date={habitData.startDate}
-              onConfirm={(date) => {
-                setIsStartPickerOpen(false);
-                setStartDateInput(date);
-              }}
-              onCancel={() => setIsStartPickerOpen(false)}
-            />
-          </>
-        )}
-      </View>
-
-      {/* End Date */}
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>End Date</Text>
-        {Platform.OS === 'web' ? (
-          <Input
-            type="date"
-            value={endDateInput}
-            onChange={(e) => setEndDateInput(e.target.value)}
-            style={styles.webDateInput}
+        </View>
+    
+        {/* Description */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Description</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={habitData.description}
+            onChangeText={(text) => handleInputChange('description', text)}
+            placeholder="What is this habit about?"
+            multiline
+            numberOfLines={4}
           />
-        ) : (
-          <>
-            <Pressable
-              style={styles.dateButton}
-              onPress={() => setIsEndPickerOpen(true)}
-            >
-              <Text style={styles.dateButtonText}>
-                {endDateInput}
-              </Text>
-            </Pressable>
-            <DateTimePickerModal
-              isVisible={isEndPickerOpen}
-              mode="date" // 👈 NEW
-              minimumDate={habitData.startDate}
-              date={habitData.endDate}
-              onConfirm={(date) => {
-                setIsEndPickerOpen(false);
-                setEndDateInput(date);
-              }}
-              onCancel={() => setIsEndPickerOpen(false)}
+        </View>
+    
+        {/* Frequency */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Frequency</Text>
+          <SelectList
+            setSelected={(value) => handleInputChange('frequency', value)}
+            data={[
+              {key: 'Daily', value: 'Daily'},
+              {key: 'Weekly', value: 'Weekly'},
+              {key: 'Monthly', value: 'Monthly'},
+            ]}
+            save="value"
+            defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
+            search={false}
+            boxStyles={styles.selectBox}
+            dropdownStyles={styles.dropdownContainer}
+            dropdownItemStyles={styles.dropdownItem}
+            dropdownTextStyles={styles.dropdownText}
+            inputStyles={styles.selectInput}
+            onFocus={() => {
+              // Add focus effect if needed
+            }}
+          />
+        </View>
+    
+        {/* Start Date */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Start Date</Text>
+          {Platform.OS === 'web' ? (
+            <Input
+              type="date"
+              value={startDateInput}
+              onChange={(e) => setStartDateInput(e.target.value)}
+              style={styles.webDateInput}
             />
-          </>
-        )}
-      </View>
-
-      {/* Submit */}
-      <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Add Habit</Text>
-      </Pressable>
+          ) : (
+            <>
+              <Pressable
+                style={styles.dateButton}
+                onPress={() => setIsStartPickerOpen(true)}
+              >
+                <Text style={styles.dateButtonText}>
+                  {startDateInput}
+                </Text>
+              </Pressable>
+              <DateTimePickerModal
+                isVisible={isStartPickerOpen}
+                mode="date" 
+                date={habitData.startDate}
+                onConfirm={(date) => {
+                  setIsStartPickerOpen(false);
+                  setStartDateInput(date);
+                }}
+                onCancel={() => setIsStartPickerOpen(false)}
+              />
+            </>
+          )}
+        </View>
+    
+        {/* End Date */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>End Date</Text>
+          {Platform.OS === 'web' ? (
+            <Input
+              type="date"
+              value={endDateInput}
+              onChange={(e) => setEndDateInput(e.target.value)}
+              style={styles.webDateInput}
+            />
+          ) : (
+            <>
+              <Pressable
+                style={styles.dateButton}
+                onPress={() => setIsEndPickerOpen(true)}
+              >
+                <Text style={styles.dateButtonText}>
+                  {endDateInput}
+                </Text>
+              </Pressable>
+              <DateTimePickerModal
+                isVisible={isEndPickerOpen}
+                mode="date" // 👈 NEW
+                minimumDate={habitData.startDate}
+                date={habitData.endDate}
+                onConfirm={(date) => {
+                  setIsEndPickerOpen(false);
+                  setEndDateInput(date);
+                }}
+                onCancel={() => setIsEndPickerOpen(false)}
+              />
+            </>
+          )}
+        </View>
+    
+        {/* Submit */}
+        <Pressable style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Add Habit</Text>
+        </Pressable>
+      </ScrollView>
     </View>
   );
 }
