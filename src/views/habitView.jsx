@@ -1,9 +1,36 @@
-import { View, Text, FlatList, StyleSheet, Pressable } from "react-native";
+import { View, Text, FlatList, StyleSheet, Pressable, Platform, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
 
 export function HabitView({ user, habits, onDeleteHabit }) {
   const navigation = useNavigation();
+  const [deletingHabitId, setDeletingHabitId] = useState(null);
 
+  const handleDelete = async ({ userId, habitId }) => {
+    try {
+      setDeletingHabitId(habitId);
+      await onDeleteHabit({ userId, habitId });
+      if (Platform.OS === 'web') {
+        window.alert("Habit deleted successfully!");
+      } else {
+        Alert.alert(
+          "Success",
+          "Habit deleted successfully!"
+        );
+      }
+    } catch (error) {
+      if (Platform.OS === 'web') {
+        window.alert("Failed to delete habit. Please try again.");
+      } else {
+        Alert.alert(
+          "Error",
+          "Failed to delete habit. Please try again."
+        );
+      }
+    } finally {
+      setDeletingHabitId(null);
+    }
+  };
 
   const renderHabitItem = ({ item }) => (
     <View style={styles.habitItem}>
@@ -37,9 +64,12 @@ export function HabitView({ user, habits, onDeleteHabit }) {
         </Pressable>
         <Pressable 
           style={[styles.editButton, styles.deleteButton]}
-          onPress={() => onDeleteHabit({ userId: user.uid, habitId: item.id })}
+          onPress={() => handleDelete({ userId: user.uid, habitId: item.id })}
+          disabled={deletingHabitId === item.id}
         >
-          <Text style={styles.buttonText}>Delete</Text>
+          <Text style={styles.buttonText}>
+            {deletingHabitId === item.id ? 'Deleting...' : 'Delete'}
+          </Text>
         </Pressable>
       </View>
     </View>

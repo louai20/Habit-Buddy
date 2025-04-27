@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useState, useEffect } from "react";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -9,20 +9,20 @@ import {
   Platform,
   StyleSheet,
   ScrollView,
-} from 'react-native';
-import { Input } from 'react-native-elements';
-import DropDownPicker from 'react-native-dropdown-picker';
+} from "react-native";
+import { Input } from "react-native-elements";
+import DropDownPicker from "react-native-dropdown-picker";
 
-export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
+export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
   const route = useRoute();
   const navigation = useNavigation();
   const habitFromRoute = route.params?.habit;
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
-    {label: 'Daily', value: 'Daily'},
-    {label: 'Weekly', value: 'Weekly'},
-    {label: 'Monthly', value: 'Monthly'},
+    { label: "Daily", value: "Daily" },
+    { label: "Weekly", value: "Weekly" },
+    { label: "Monthly", value: "Monthly" },
   ]);
 
   // Add useEffect to update form when navigation params change
@@ -30,9 +30,9 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
     if (habitFromRoute) {
       setSelectedHabit(habitFromRoute);
       setHabitData({
-        name: habitFromRoute.name || '',
-        description: habitFromRoute.description || '',
-        frequency: habitFromRoute.frequency || '',
+        name: habitFromRoute.name || "",
+        description: habitFromRoute.description || "",
+        frequency: habitFromRoute.frequency || "",
         startDate: new Date(habitFromRoute.startDate),
         endDate: new Date(habitFromRoute.endDate),
       });
@@ -41,17 +41,23 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
 
   const [selectedHabit, setSelectedHabit] = useState(habitFromRoute);
   const [habitData, setHabitData] = useState({
-    name: habitFromRoute?.name || '',
-    description: habitFromRoute?.description || '',
-    frequency: habitFromRoute?.frequency || '',
+    name: habitFromRoute?.name || "",
+    description: habitFromRoute?.description || "",
+    frequency: habitFromRoute?.frequency || "",
     startDate: new Date(habitFromRoute?.startDate) || new Date(),
     endDate: new Date(habitFromRoute?.endDate) || new Date(),
   });
 
-  const [startDateInput, setStartDateInput] = useState(habitData.startDate.toISOString().split('T')[0]);
-  const [endDateInput, setEndDateInput] = useState(habitData.endDate.toISOString().split('T')[0]);
+  const [startDateInput, setStartDateInput] = useState(
+    habitData.startDate.toISOString().split("T")[0]
+  );
+  const [endDateInput, setEndDateInput] = useState(
+    habitData.endDate.toISOString().split("T")[0]
+  );
   const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
   const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleInputChange = (field, value) => {
     setHabitData((prev) => ({ ...prev, [field]: value }));
@@ -59,89 +65,102 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
 
   const handleUpdate = async () => {
     if (!habitData.name.trim()) {
-      if (Platform.OS === 'web') {
-        window.alert('Empty name');
+      if (Platform.OS === "web") {
+        window.alert("Empty name");
       } else {
-        Alert.alert('Empty name');
+        Alert.alert("Empty name");
       }
       return;
     }
 
-    const isValidDate = (str) => /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(new Date(str).getTime());
+    const isValidDate = (str) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(new Date(str).getTime());
 
     if (!isValidDate(startDateInput) || !isValidDate(endDateInput)) {
-      if (Platform.OS === 'web') {
-        window.alert('Invalid Date');
+      if (Platform.OS === "web") {
+        window.alert("Invalid Date");
       } else {
-        Alert.alert('Invalid Date');
+        Alert.alert("Invalid Date");
       }
       return;
     }
-
 
     const startDate = new Date(startDateInput);
     const endDate = new Date(endDateInput);
-  
+
     if (endDate < startDate) {
-      if (Platform.OS === 'web') {
-        window.alert('End date cannot be before start date.');
+      if (Platform.OS === "web") {
+        window.alert("End date cannot be before start date.");
       } else {
-        Alert.alert('End date cannot be before start date.');
+        Alert.alert("End date cannot be before start date.");
       }
       return;
     }
 
     try {
-
-    const updatedHabit = {
+      setIsUpdating(true);
+      const updatedHabit = {
         ...habitData,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        };
+      };
 
-       await onUpdateHabit( {userId: user.uid, 
-         habitId: selectedHabit.id, 
-         updatedData: updatedHabit 
+      await onUpdateHabit({
+        userId: user.uid,
+        habitId: selectedHabit.id,
+        updatedData: updatedHabit,
       });
-      console.log('VIEW: Habit updated successfully!');
 
-      if (Platform.OS === 'web') {
-        window.alert('Success\n\nHabit updated successfully!');
-        } else {
-        Alert.alert('Success', 'Habit updated successfully!');
-        }
-        navigation.navigate('habit'); 
+      if (Platform.OS === "web") {
+        window.alert("Success\n\nHabit updated successfully!");
+      } else {
+        Alert.alert("Success", "Habit updated successfully!");
+      }
+      navigation.navigate("habit");
     } catch (error) {
-      Alert.alert('EditHabitView: Error updating habit:', error);
+      Alert.alert("EditHabitView: Error updating habit:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   const handleDelete = async (habitId) => {
     try {
+      setIsDeleting(true);
       await onDeleteHabit({ userId: user.uid, habitId: habitId });
       if (selectedHabit?.id === habitId) {
         setSelectedHabit(null);
         setHabitData({
-          name: '',
-          description: '',
-          frequency: '',
+          name: "",
+          description: "",
+          frequency: "",
           startDate: new Date(),
           endDate: new Date(),
         });
       }
+      if (Platform.OS === "web") {
+        window.alert("Habit deleted successfully!");
+      } else {
+        Alert.alert("Success", "Habit deleted successfully!");
+      }
+      navigation.navigate("habit");
     } catch (error) {
-      console.error('Error deleting habit:', error);
+      if (Platform.OS === "web") {
+        window.alert("Failed to delete habit. Please try again.");
+      } else {
+        Alert.alert("Error", "Failed to delete habit. Please try again.");
+      }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-
   return (
     <View style={styles.container}>
-
       {/*Form to edit the selected habit*/}
       <View style={styles.formContainer}>
         <Text style={styles.title}>
-          {selectedHabit ? 'Edit Habit' : 'Select a Habit to Edit'}
+          {selectedHabit ? "Edit Habit" : "Select a Habit to Edit"}
         </Text>
         {selectedHabit ? (
           <ScrollView style={styles.formScroll}>
@@ -151,7 +170,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
               <TextInput
                 style={styles.input}
                 value={habitData.name}
-                onChangeText={(text) => handleInputChange('name', text)}
+                onChangeText={(text) => handleInputChange("name", text)}
                 placeholder="e.g., Meditate"
               />
             </View>
@@ -162,7 +181,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={habitData.description}
-                onChangeText={(text) => handleInputChange('description', text)}
+                onChangeText={(text) => handleInputChange("description", text)}
                 placeholder="What is this habit about?"
                 multiline
                 numberOfLines={4}
@@ -170,7 +189,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             </View>
 
             {/* Frequency */}
-            <View style={[styles.formGroup,  { zIndex: 1000 }]}>
+            <View style={[styles.formGroup, { zIndex: 1000 }]}>
               <Text style={styles.label}>Frequency</Text>
               <DropDownPicker
                 open={open}
@@ -179,7 +198,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
                 setOpen={setOpen}
                 setValue={(callback) => {
                   const value = callback(habitData.frequency);
-                  handleInputChange('frequency', value);
+                  handleInputChange("frequency", value);
                 }}
                 setItems={setItems}
                 autoScroll={false}
@@ -193,42 +212,54 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             {/* Start Date */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Start Date</Text>
-              {(
+              {
                 <Input
                   type="date"
                   value={startDateInput}
                   onChange={(e) => setStartDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
-              )}
+              }
             </View>
 
             {/* End Date */}
             <View style={[styles.formGroup]}>
               <Text style={styles.label}>End Date</Text>
-              {(
+              {
                 <Input
                   type="date"
                   value={endDateInput}
                   onChange={(e) => setEndDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
-              )}
+              }
             </View>
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
-              <Pressable style={[styles.button, styles.updateButton]} onPress={handleUpdate}>
-                <Text style={styles.buttonText}>Update Habit</Text>
+              <Pressable
+                style={[styles.button, styles.updateButton]}
+                onPress={handleUpdate}
+              >
+                <Text style={styles.buttonText}>
+                  {isUpdating ? "Updating..." : "Update Habit"}
+                </Text>
               </Pressable>
-              <Pressable style={[styles.button, styles.deleteButton]} onPress={() => handleDelete(selectedHabit.id)}>
-                <Text style={styles.buttonText}>Delete Habit</Text>
+              <Pressable
+                style={[styles.button, styles.deleteButton]}
+                onPress={() => handleDelete(selectedHabit.id)}
+              >
+                <Text style={styles.buttonText}>
+                  {isDeleting ? "Deleting..." : "Delete Habit"}
+                </Text>
               </Pressable>
             </View>
           </ScrollView>
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>Select a habit from the list to edit</Text>
+            <Text style={styles.emptyStateText}>
+              Select a habit from the list to edit
+            </Text>
           </View>
         )}
       </View>
@@ -239,14 +270,14 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#f9fafb',
+    flexDirection: "row",
+    backgroundColor: "#f9fafb",
   },
   listContainer: {
     flex: 1,
     padding: 16,
     borderRightWidth: 1,
-    borderRightColor: '#e5e7eb',
+    borderRightColor: "#e5e7eb",
   },
   formContainer: {
     flex: 1,
@@ -254,62 +285,62 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   listContent: {
     paddingBottom: 20,
   },
   habitItem: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    boxShadowColor: '#000',
+    boxShadowColor: "#000",
     boxShadowOpacity: 0.04,
     boxShadowRadius: 3,
     boxShadowOffset: { width: 0, height: 2 },
   },
   selectedHabitItem: {
-    borderColor: '#3b82f6',
+    borderColor: "#3b82f6",
     borderWidth: 2,
   },
   habitName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   habitDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 8,
   },
   habitFrequency: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 8,
   },
   habitDates: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   dateText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   deleteButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: "#ef4444",
     padding: 6,
     borderRadius: 20,
-    alignItems: 'center',
+    alignItems: "center",
     width: 80,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   deleteButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
     fontSize: 12,
   },
   formScroll: {
@@ -319,34 +350,34 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
-    color: '#374151',
+    color: "#374151",
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    boxShadowColor: '#000',
+    borderColor: "#e5e7eb",
+    boxShadowColor: "#000",
     boxShadowOpacity: 0.04,
     boxShadowRadius: 3,
     boxShadowOffset: { width: 0, height: 2 },
   },
   textArea: {
     height: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   dateButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 14,
     borderRadius: 12,
-    alignItems: 'center',
-    boxShadowColor: '#000',
+    alignItems: "center",
+    boxShadowColor: "#000",
     boxShadowOpacity: 0.04,
     boxShadowRadius: 3,
     boxShadowOffset: { width: 0, height: 2 },
@@ -354,99 +385,99 @@ const styles = StyleSheet.create({
   webDateInput: {
     padding: 14,
     borderWidth: 0,
-    borderColor: '#fff',
+    borderColor: "#fff",
     fontSize: 16,
-    backgroundColor: '#fff',
-    width: '100%',
+    backgroundColor: "#fff",
+    width: "100%",
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   button: {
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 5,
-    boxShadowColor: '#000',
+    boxShadowColor: "#000",
     boxShadowOpacity: 0.1,
     boxShadowRadius: 6,
     boxShadowOffset: { width: 0, height: 4 },
   },
   updateButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: "#3b82f6",
   },
   deleteButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: "#ef4444",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   selectInput: {
-    color: '#374151',
+    color: "#374151",
     fontSize: 16,
-    ':hover': {
-      color: '#1f2937',
+    ":hover": {
+      color: "#1f2937",
     },
   },
   dropdownContainer: {
-    backgroundColor: '#fff',
-    borderColor: '#e5e7eb',
+    backgroundColor: "#fff",
+    borderColor: "#e5e7eb",
     borderWidth: 1,
     marginTop: 5,
     borderRadius: 12,
-    boxShadowColor: '#000',
+    boxShadowColor: "#000",
     boxShadowOpacity: 0.1,
     boxShadowRadius: 4,
     boxShadowOffset: { width: 0, height: 2 },
   },
   dropdownItem: {
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: "#e5e7eb",
     borderBottomWidth: 1,
     padding: 12,
-    ':hover': {
-      backgroundColor: '#f3f4f6',
+    ":hover": {
+      backgroundColor: "#f3f4f6",
     },
-    cursor: 'pointer', // Add cursor pointer for web
+    cursor: "pointer", // Add cursor pointer for web
   },
   dropdownText: {
-    color: '#374151',
+    color: "#374151",
     fontSize: 16,
   },
   dropdownStyle: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    borderColor: '#e5e7eb',
+    borderColor: "#e5e7eb",
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   dropdownContainer: {
-    backgroundColor: '#fff',
-    borderColor: '#e5e7eb',
+    backgroundColor: "#fff",
+    borderColor: "#e5e7eb",
     borderWidth: 1,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   dropdownText: {
-    color: '#374151',
+    color: "#374151",
     fontSize: 16,
   },
 });
