@@ -8,6 +8,7 @@ import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import ProgressPresenter from "../../presenters/progressPresenter";
 import HabitPresenter from "../../presenters/habitPresenter";
+import HabitTrackerPresenter from "../../presenters/habitTrackerPresenter";
 
 const Tab = createBottomTabNavigator();
 
@@ -50,6 +51,14 @@ export default function TabsLayout() {
           options={{
             title: 'Habit',
             tabBarIcon: () => <Text>📝</Text>,
+          }}
+        />
+        <Tab.Screen
+          name="habitTracker"
+          component={HabitTrackerPresenter}
+          options={{
+            title: 'Habit Tracker',
+            tabBarButton: () => null,
           }}
         />
         <Tab.Screen

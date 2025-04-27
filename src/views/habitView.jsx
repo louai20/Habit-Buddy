@@ -24,6 +24,12 @@ export function HabitView({ user, habits, onDeleteHabit }) {
       </View>
       <View style={styles.buttonContainer}>
         <Pressable 
+          style={[styles.editButton, styles.trackerButton]}
+          onPress={() => navigation.navigate('habitTracker', { habit: item })}
+        >
+          <Text style={styles.buttonText}>Track</Text>
+        </Pressable>
+        <Pressable 
           style={styles.editButton}
           onPress={() => navigation.navigate('editHabit', { habit: item })}
         >
@@ -178,5 +184,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     includeFontPadding: false,
     marginTop: -2,
+  },
+  trackerButton: {
+    backgroundColor: '#10b981', // Green color for the tracker button
   },
 });

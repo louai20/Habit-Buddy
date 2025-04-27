@@ -11,12 +11,19 @@ import {
   ScrollView,
 } from 'react-native';
 import { Input } from 'react-native-elements';
-import { SelectList } from 'react-native-dropdown-select-list';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
   const route = useRoute();
   const navigation = useNavigation();
   const habitFromRoute = route.params?.habit;
+
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    {label: 'Daily', value: 'Daily'},
+    {label: 'Weekly', value: 'Weekly'},
+    {label: 'Monthly', value: 'Monthly'},
+  ]);
 
   // Add useEffect to update form when navigation params change
   useEffect(() => {
@@ -163,22 +170,23 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             </View>
 
             {/* Frequency */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup,  { zIndex: 1000 }]}>
               <Text style={styles.label}>Frequency</Text>
-              <SelectList
-                setSelected={(value) => handleInputChange('frequency', value)}
-                data={[
-                  {key: 'Daily', value: 'Daily'},
-                  {key: 'Weekly', value: 'Weekly'},
-                  {key: 'Monthly', value: 'Monthly'},
-                ]}
-                save="value"
-                defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
-                search={false}
-                boxStyles={styles.selectBox}
-                dropdownStyles={styles.dropdownContainer}
-                dropdownItemStyles={styles.dropdownItem}
-                dropdownTextStyles={styles.dropdownText}
+              <DropDownPicker
+                open={open}
+                value={habitData.frequency}
+                items={items}
+                setOpen={setOpen}
+                setValue={(callback) => {
+                  const value = callback(habitData.frequency);
+                  handleInputChange('frequency', value);
+                }}
+                setItems={setItems}
+                autoScroll={false}
+                style={styles.dropdownStyle}
+                dropDownContainerStyle={styles.dropdownContainer}
+                textStyle={styles.dropdownText}
+                placeholder="Select frequency"
               />
             </View>
 
@@ -196,7 +204,7 @@ export function EditHabitView({  user, habits, onUpdateHabit, onDeleteHabit }) {
             </View>
 
             {/* End Date */}
-            <View style={styles.formGroup}>
+            <View style={[styles.formGroup]}>
               <Text style={styles.label}>End Date</Text>
               {(
                 <Input
@@ -414,6 +422,28 @@ const styles = StyleSheet.create({
       backgroundColor: '#f3f4f6',
     },
     cursor: 'pointer', // Add cursor pointer for web
+  },
+  dropdownText: {
+    color: '#374151',
+    fontSize: 16,
+  },
+  dropdownStyle: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dropdownContainer: {
+    backgroundColor: '#fff',
+    borderColor: '#e5e7eb',
+    borderWidth: 1,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   dropdownText: {
     color: '#374151',

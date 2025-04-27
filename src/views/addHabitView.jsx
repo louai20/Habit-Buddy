@@ -7,12 +7,12 @@ import {
   Alert,
   Platform,
   StyleSheet,
-  ScrollView,  // Add this import
+  ScrollView,
 } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-import { SelectList } from 'react-native-dropdown-select-list';
+import { SelectList } from 'react-native-dropdown-select-list';  // Change this import
 
 export function AddHabitView({ user, onSetHabit }) {
   const navigation = useNavigation();
@@ -98,6 +98,16 @@ export function AddHabitView({ user, onSetHabit }) {
     }
   };
 
+  // Remove these states as they're not needed anymore
+  // const [open, setOpen] = useState(false);
+  // const [items, setItems] = useState([...]);
+
+  const frequencies = [
+    { key: 'Daily', value: 'Daily' },
+    { key: 'Weekly', value: 'Weekly' },
+    { key: 'Monthly', value: 'Monthly' },
+  ];
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -130,11 +140,7 @@ export function AddHabitView({ user, onSetHabit }) {
           <Text style={styles.label}>Frequency</Text>
           <SelectList
             setSelected={(value) => handleInputChange('frequency', value)}
-            data={[
-              {key: 'Daily', value: 'Daily'},
-              {key: 'Weekly', value: 'Weekly'},
-              {key: 'Monthly', value: 'Monthly'},
-            ]}
+            data={frequencies}
             save="value"
             defaultOption={{ key: habitData.frequency, value: habitData.frequency }}
             search={false}
@@ -142,10 +148,6 @@ export function AddHabitView({ user, onSetHabit }) {
             dropdownStyles={styles.dropdownContainer}
             dropdownItemStyles={styles.dropdownItem}
             dropdownTextStyles={styles.dropdownText}
-            inputStyles={styles.selectInput}
-            onFocus={() => {
-              // Add focus effect if needed
-            }}
           />
         </View>
     
@@ -160,26 +162,17 @@ export function AddHabitView({ user, onSetHabit }) {
               style={styles.webDateInput}
             />
           ) : (
-            <>
-              <Pressable
-                style={styles.dateButton}
-                onPress={() => setIsStartPickerOpen(true)}
-              >
-                <Text style={styles.dateButtonText}>
-                  {startDateInput}
-                </Text>
-              </Pressable>
-              <DateTimePickerModal
-                isVisible={isStartPickerOpen}
-                mode="date" 
-                date={habitData.startDate}
-                onConfirm={(date) => {
-                  setIsStartPickerOpen(false);
-                  setStartDateInput(date);
-                }}
-                onCancel={() => setIsStartPickerOpen(false)}
-              />
-            </>
+            <DateTimePicker
+              value={habitData.startDate}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                if (selectedDate) {
+                  setStartDateInput(selectedDate.toISOString().split('T')[0]);
+                  setHabitData(prev => ({...prev, startDate: selectedDate}));
+                }
+              }}
+            />
           )}
         </View>
     
@@ -194,27 +187,18 @@ export function AddHabitView({ user, onSetHabit }) {
               style={styles.webDateInput}
             />
           ) : (
-            <>
-              <Pressable
-                style={styles.dateButton}
-                onPress={() => setIsEndPickerOpen(true)}
-              >
-                <Text style={styles.dateButtonText}>
-                  {endDateInput}
-                </Text>
-              </Pressable>
-              <DateTimePickerModal
-                isVisible={isEndPickerOpen}
-                mode="date" // 👈 NEW
-                minimumDate={habitData.startDate}
-                date={habitData.endDate}
-                onConfirm={(date) => {
-                  setIsEndPickerOpen(false);
-                  setEndDateInput(date);
-                }}
-                onCancel={() => setIsEndPickerOpen(false)}
-              />
-            </>
+            <DateTimePicker
+              value={habitData.endDate}
+              mode="date"
+              display="default"
+              minimumDate={habitData.startDate}
+              onChange={(event, selectedDate) => {
+                if (selectedDate) {
+                  setEndDateInput(selectedDate.toISOString().split('T')[0]);
+                  setHabitData(prev => ({...prev, endDate: selectedDate}));
+                }
+              }}
+            />
           )}
         </View>
     
@@ -308,50 +292,5 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     marginTop: 50,
-  },
-  selectBox: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    boxShadowColor: '#000',
-    boxShadowOpacity: 0.04,
-    boxShadowRadius: 3,
-    boxShadowOffset: { width: 0, height: 2 },
-    cursor: 'pointer', // Add cursor pointer for web
-  },
-  selectInput: {
-    color: '#374151',
-    fontSize: 16,
-    ':hover': {
-      color: '#1f2937',
-    },
-  },
-  dropdownContainer: {
-    backgroundColor: '#fff',
-    borderColor: '#e5e7eb',
-    borderWidth: 1,
-    marginTop: 5,
-    borderRadius: 12,
-    boxShadowColor: '#000',
-    boxShadowOpacity: 0.1,
-    boxShadowRadius: 4,
-    boxShadowOffset: { width: 0, height: 2 },
-  },
-  dropdownItem: {
-    borderBottomColor: '#e5e7eb',
-    borderBottomWidth: 1,
-    padding: 12,
-    ':hover': {
-      backgroundColor: '#f3f4f6',
-    },
-    cursor: 'pointer', // Add cursor pointer for web
-  },
-  dropdownText: {
-    color: '#374151',
-    fontSize: 16,
   },
 });
