@@ -8,7 +8,9 @@ import {
   Alert,
   Platform,
   StyleSheet,
-  ScrollView,
+  // Remove ScrollView, add FlatList
+  // ScrollView,
+  FlatList,
 } from "react-native";
 import { Input } from "react-native-elements";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -157,6 +159,153 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
     }
   };
 
+  // Define renderItem for the FlatList
+  const renderForm = () => (
+    <>
+      {/* Name */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Habit Name</Text>
+        <TextInput
+          style={styles.input}
+          value={habitData.name}
+          onChangeText={(text) => handleInputChange("name", text)}
+          placeholder="e.g., Meditate"
+        />
+      </View>
+
+      {/* Description */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={habitData.description}
+          onChangeText={(text) => handleInputChange("description", text)}
+          placeholder="What is this habit about?"
+          multiline
+          numberOfLines={4}
+        />
+      </View>
+
+      {/* Start Date */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Start Date</Text>
+        {Platform.OS === 'web' ? (
+          <Input
+            type="date"
+            value={startDateInput}
+            onChange={(e) => setStartDateInput(e.target.value)}
+            style={styles.webDateInput}
+          />
+        ) : (
+          <>
+            {/* Button to trigger the picker */}
+            <Pressable onPress={() => setIsStartPickerOpen(true)} style={styles.dateButton}>
+              <Text style={styles.dateButtonText}>{startDateInput || 'Select Start Date'}</Text>
+            </Pressable>
+            {/* Conditionally render the DateTimePicker */}
+            {isStartPickerOpen && (
+              <DateTimePicker
+                value={habitData.startDate}
+                mode="date"
+                display="default" // Or "spinner", "calendar"
+                onChange={(event, selectedDate) => {
+                  setIsStartPickerOpen(false); // Close picker regardless of action
+                  if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                    const dateString = selectedDate.toISOString().split('T')[0];
+                    setStartDateInput(dateString);
+                    setHabitData(prev => ({ ...prev, startDate: selectedDate }));
+                  }
+                }}
+              />
+            )}
+          </>
+        )}
+      </View>
+
+      {/* End Date */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>End Date</Text>
+        {Platform.OS === 'web' ? (
+          <Input
+            type="date"
+            value={endDateInput}
+            onChange={(e) => setEndDateInput(e.target.value)}
+            style={styles.webDateInput}
+          />
+        ) : (
+          <>
+            {/* Button to trigger the picker */}
+            <Pressable onPress={() => setIsEndPickerOpen(true)} style={styles.dateButton}>
+              <Text style={styles.dateButtonText}>{endDateInput || 'Select End Date'}</Text>
+            </Pressable>
+            {/* Conditionally render the DateTimePicker */}
+            {isEndPickerOpen && (
+              <DateTimePicker
+                value={habitData.endDate}
+                mode="date"
+                display="default" // Or "spinner", "calendar"
+                minimumDate={habitData.startDate} // Keep minimum date logic
+                onChange={(event, selectedDate) => {
+                  setIsEndPickerOpen(false); // Close picker regardless of action
+                  if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                    const dateString = selectedDate.toISOString().split('T')[0];
+                    setEndDateInput(dateString);
+                    setHabitData(prev => ({ ...prev, endDate: selectedDate }));
+                  }
+                }}
+              />
+            )}
+          </>
+        )}
+      </View>
+
+      {/* Frequency */}
+      <View style={[styles.formGroup, { zIndex: 1000 }]}>
+        <Text style={styles.label}>Frequency</Text>
+        <DropDownPicker
+          open={open}
+          value={habitData.frequency}
+          items={items}
+          setOpen={setOpen}
+          setValue={(callback) => {
+            const value = callback(habitData.frequency);
+            handleInputChange("frequency", value);
+          }}
+          setItems={setItems}
+          style={styles.dropdownStyle}
+          dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={styles.dropdownText}
+          placeholder="Select frequency"
+          // The scrollViewProps might not be needed here anymore,
+          // but shouldn't hurt if left. Test for desired behavior.
+          // scrollViewProps={{
+          //   scrollEnabled: false,
+          // }}
+        />
+      </View>
+      {/* Buttons */}
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.button, styles.updateButton]}
+          onPress={handleUpdate}
+        >
+          <Text style={styles.buttonText}>
+            {isUpdating ? "Updating..." : "Update Habit"}
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.button, styles.deleteButton]}
+          onPress={() => handleDelete(selectedHabit.id)}
+        >
+          <Text style={styles.buttonText}>
+            {isDeleting ? "Deleting..." : "Delete Habit"}
+          </Text>
+        </Pressable>
+      </View>
+    </>
+  );
+
+
   return (
     <View style={styles.container}>
       {/*Form to edit the selected habit*/}
@@ -165,146 +314,19 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
           {selectedHabit ? "Edit Habit" : "Select a Habit to Edit"}
         </Text>
         {selectedHabit ? (
-          <ScrollView style={styles.formScroll}>
-            {/* Name */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Habit Name</Text>
-              <TextInput
-                style={styles.input}
-                value={habitData.name}
-                onChangeText={(text) => handleInputChange("name", text)}
-                placeholder="e.g., Meditate"
-              />
-            </View>
-
-            {/* Description */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Description</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={habitData.description}
-                onChangeText={(text) => handleInputChange("description", text)}
-                placeholder="What is this habit about?"
-                multiline
-                numberOfLines={4}
-              />
-            </View>
-
-
-
-            {/* Start Date */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Start Date</Text>
-              {Platform.OS === 'web' ? (
-                <Input
-                  type="date"
-                  value={startDateInput}
-                  onChange={(e) => setStartDateInput(e.target.value)}
-                  style={styles.webDateInput}
-                />
-              ) : (
-                <>
-                  {/* Button to trigger the picker */}
-                  <Pressable onPress={() => setIsStartPickerOpen(true)} style={styles.dateButton}>
-                    <Text style={styles.dateButtonText}>{startDateInput || 'Select Start Date'}</Text>
-                  </Pressable>
-                  {/* Conditionally render the DateTimePicker */}
-                  {isStartPickerOpen && (
-                    <DateTimePicker
-                      value={habitData.startDate}
-                      mode="date"
-                      display="default" // Or "spinner", "calendar"
-                      onChange={(event, selectedDate) => {
-                        setIsStartPickerOpen(false); // Close picker regardless of action
-                        if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
-                          const dateString = selectedDate.toISOString().split('T')[0];
-                          setStartDateInput(dateString);
-                          setHabitData(prev => ({ ...prev, startDate: selectedDate }));
-                        }
-                      }}
-                    />
-                  )}
-                </>
-              )}
-            </View>
-
-            {/* End Date */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>End Date</Text>
-              {Platform.OS === 'web' ? (
-                <Input
-                  type="date"
-                  value={endDateInput}
-                  onChange={(e) => setEndDateInput(e.target.value)}
-                  style={styles.webDateInput}
-                />
-              ) : (
-                <>
-                  {/* Button to trigger the picker */}
-                  <Pressable onPress={() => setIsEndPickerOpen(true)} style={styles.dateButton}>
-                    <Text style={styles.dateButtonText}>{endDateInput || 'Select End Date'}</Text>
-                  </Pressable>
-                  {/* Conditionally render the DateTimePicker */}
-                  {isEndPickerOpen && (
-                    <DateTimePicker
-                      value={habitData.endDate}
-                      mode="date"
-                      display="default" // Or "spinner", "calendar"
-                      minimumDate={habitData.startDate} // Keep minimum date logic
-                      onChange={(event, selectedDate) => {
-                        setIsEndPickerOpen(false); // Close picker regardless of action
-                        if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
-                          const dateString = selectedDate.toISOString().split('T')[0];
-                          setEndDateInput(dateString);
-                          setHabitData(prev => ({ ...prev, endDate: selectedDate }));
-                        }
-                      }}
-                    />
-                  )}
-                </>
-              )}
-            </View>
-
-            {/* Frequency */}
-            <View style={[styles.formGroup, { zIndex: 1000 }]}>
-              <Text style={styles.label}>Frequency</Text>
-              <DropDownPicker
-                open={open}
-                value={habitData.frequency}
-                items={items}
-                setOpen={setOpen}
-                setValue={(callback) => {
-                  const value = callback(habitData.frequency);
-                  handleInputChange("frequency", value);
-                }}
-                setItems={setItems}
-                autoScroll={false}
-                style={styles.dropdownStyle}
-                dropDownContainerStyle={styles.dropdownContainer}
-                textStyle={styles.dropdownText}
-                placeholder="Select frequency"
-              />
-            </View>
-            {/* Buttons */}
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={[styles.button, styles.updateButton]}
-                onPress={handleUpdate}
-              >
-                <Text style={styles.buttonText}>
-                  {isUpdating ? "Updating..." : "Update Habit"}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.button, styles.deleteButton]}
-                onPress={() => handleDelete(selectedHabit.id)}
-              >
-                <Text style={styles.buttonText}>
-                  {isDeleting ? "Deleting..." : "Delete Habit"}
-                </Text>
-              </Pressable>
-            </View>
-          </ScrollView>
+          // Replace ScrollView with FlatList
+          <FlatList
+            data={[1]} // Dummy data array with one item
+            renderItem={renderForm} // Render the entire form as the item
+            keyExtractor={(item) => 'edit-form'} // Simple key
+            style={styles.formScroll} // Apply scroll styles here
+            // Prevent FlatList's own pull-to-refresh or other indicators if not needed
+            showsVerticalScrollIndicator={false}
+            // Ensure dropdowns aren't clipped (might need adjustment based on layout)
+            // contentContainerStyle={{ paddingBottom: 200 }} // Add padding if dropdown gets cut off
+            // Important for DropDownPicker if it opens downwards significantly
+            keyboardShouldPersistTaps="handled"
+          />
         ) : (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
