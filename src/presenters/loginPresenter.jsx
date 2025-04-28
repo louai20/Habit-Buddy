@@ -2,20 +2,39 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { LoginView } from '../views/loginView';
 import { loginWithEmail } from '../models/authSlice';
+import { Alert } from 'react-native'; // Import Alert
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const LoginPresenter = ({ login, loading, error, user, navigation }) => {
+const LoginPresenter = ({ login, loading, error, user }) => { // Remove navigation from props if using the hook
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation(); // Get navigation object using the hook
+
   useEffect(() => {
-    // If user is already logged in, redirect to habits page
-    if (user) {
-      navigation.navigate('dashboard'); // Navigate to the habits page
+    // If user is logged in, show success alert and redirect
+    if (user && user.name) { // Check if user and user.name exist
+      // Construct the message string first
+      const successMessage = `Login successful! Welcome back, ${user.name}.`;
+      Alert.alert('Success', successMessage); // Show success alert with the user's name
+      navigation.navigate('dashboard'); // Navigate to the dashboard page
+    } else if (user) { // Fallback if user exists but name doesn't
+      Alert.alert('Success', 'Login successful! Welcome back.');
+      navigation.navigate('dashboard');
     }
   }, [user, navigation]);
 
+  // Add useEffect for error alert
+  useEffect(() => {
+    if (error) {
+      // Show error alert if login fails
+      Alert.alert('Login Failed', error);
+    }
+  }, [error]);
+
   const handleSubmit = () => {
     if (!email || !password) {
-      alert('Please fill in both email and password');
+      // Use Alert.alert for cross-platform compatibility
+      Alert.alert('Missing Information', 'Please fill in both email and password');
       return;
     }
 
@@ -29,7 +48,8 @@ const LoginPresenter = ({ login, loading, error, user, navigation }) => {
       onPasswordChange={setPassword}
       onSubmit={handleSubmit}
       loading={loading}
-      error={error}
+      // Pass error to the view if you want to display it there too, otherwise remove
+      // error={error}
     />
   );
 };
