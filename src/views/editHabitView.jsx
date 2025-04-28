@@ -55,6 +55,7 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
   const [endDateInput, setEndDateInput] = useState(
     habitData.endDate.toISOString().split("T")[0]
   );
+  // (Ensure isStartPickerOpen and isEndPickerOpen are initialized to false)
   const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
   const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -189,6 +190,81 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
               />
             </View>
 
+
+
+            {/* Start Date */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Start Date</Text>
+              {Platform.OS === 'web' ? (
+                <Input
+                  type="date"
+                  value={startDateInput}
+                  onChange={(e) => setStartDateInput(e.target.value)}
+                  style={styles.webDateInput}
+                />
+              ) : (
+                <>
+                  {/* Button to trigger the picker */}
+                  <Pressable onPress={() => setIsStartPickerOpen(true)} style={styles.dateButton}>
+                    <Text style={styles.dateButtonText}>{startDateInput || 'Select Start Date'}</Text>
+                  </Pressable>
+                  {/* Conditionally render the DateTimePicker */}
+                  {isStartPickerOpen && (
+                    <DateTimePicker
+                      value={habitData.startDate}
+                      mode="date"
+                      display="default" // Or "spinner", "calendar"
+                      onChange={(event, selectedDate) => {
+                        setIsStartPickerOpen(false); // Close picker regardless of action
+                        if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                          const dateString = selectedDate.toISOString().split('T')[0];
+                          setStartDateInput(dateString);
+                          setHabitData(prev => ({ ...prev, startDate: selectedDate }));
+                        }
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
+            {/* End Date */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>End Date</Text>
+              {Platform.OS === 'web' ? (
+                <Input
+                  type="date"
+                  value={endDateInput}
+                  onChange={(e) => setEndDateInput(e.target.value)}
+                  style={styles.webDateInput}
+                />
+              ) : (
+                <>
+                  {/* Button to trigger the picker */}
+                  <Pressable onPress={() => setIsEndPickerOpen(true)} style={styles.dateButton}>
+                    <Text style={styles.dateButtonText}>{endDateInput || 'Select End Date'}</Text>
+                  </Pressable>
+                  {/* Conditionally render the DateTimePicker */}
+                  {isEndPickerOpen && (
+                    <DateTimePicker
+                      value={habitData.endDate}
+                      mode="date"
+                      display="default" // Or "spinner", "calendar"
+                      minimumDate={habitData.startDate} // Keep minimum date logic
+                      onChange={(event, selectedDate) => {
+                        setIsEndPickerOpen(false); // Close picker regardless of action
+                        if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                          const dateString = selectedDate.toISOString().split('T')[0];
+                          setEndDateInput(dateString);
+                          setHabitData(prev => ({ ...prev, endDate: selectedDate }));
+                        }
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
             {/* Frequency */}
             <View style={[styles.formGroup, { zIndex: 1000 }]}>
               <Text style={styles.label}>Frequency</Text>
@@ -209,60 +285,6 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
                 placeholder="Select frequency"
               />
             </View>
-
-            {/* Start Date */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Start Date</Text>
-              {Platform.OS === 'web' ? (
-                <Input
-                  type="date"
-                  value={startDateInput}
-                  onChange={(e) => setStartDateInput(e.target.value)}
-                  style={styles.webDateInput}
-                />
-              ) : (
-                <DateTimePicker
-                  value={habitData.startDate}
-                  mode="date"
-                  display="default"
-                  onChange={(event, selectedDate) => {
-                    if (selectedDate) {
-                      const dateString = selectedDate.toISOString().split('T')[0];
-                      setStartDateInput(dateString);
-                      setHabitData(prev => ({ ...prev, startDate: selectedDate }));
-                    }
-                  }}
-                />
-              )}
-            </View>
-
-            {/* End Date */}
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>End Date</Text>
-              {Platform.OS === 'web' ? (
-                <Input
-                  type="date"
-                  value={endDateInput}
-                  onChange={(e) => setEndDateInput(e.target.value)}
-                  style={styles.webDateInput}
-                />
-              ) : (
-                <DateTimePicker
-                  value={habitData.endDate}
-                  mode="date"
-                  display="default"
-                  minimumDate={habitData.startDate}
-                  onChange={(event, selectedDate) => {
-                    if (selectedDate) {
-                      const dateString = selectedDate.toISOString().split('T')[0];
-                      setEndDateInput(dateString);
-                      setHabitData(prev => ({ ...prev, endDate: selectedDate }));
-                    }
-                  }}
-                />
-              )}
-            </View>
-
             {/* Buttons */}
             <View style={styles.buttonContainer}>
               <Pressable
@@ -400,15 +422,18 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: "top",
   },
-  dateButton: {
+  dateButton: { // Add style for the date trigger button
     backgroundColor: "#fff",
-    padding: 14,
     borderRadius: 12,
-    alignItems: "center",
-    boxShadowColor: "#000",
-    boxShadowOpacity: 0.04,
-    boxShadowRadius: 3,
-    boxShadowOffset: { width: 0, height: 2 },
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    alignItems: 'center', // Center text horizontally
+  },
+  dateButtonText: { // Style for the text inside the button
+    fontSize: 16,
+    color: "#374151",
   },
   webDateInput: {
     padding: 14,
@@ -509,18 +534,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-
-  const handleStartDateConfirm = (date) => {
-    setIsStartPickerOpen(false);
-    const dateString = date.toISOString().split('T')[0];
-    setStartDateInput(dateString);
-    setHabitData(prev => ({ ...prev, startDate: date }));
-  };
-
-  const handleEndDateConfirm = (date) => {
-    setIsEndPickerOpen(false);
-    const dateString = date.toISOString().split('T')[0];
-    setEndDateInput(dateString);
-    setHabitData(prev => ({ ...prev, endDate: date }));
-  };
