@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Input } from "react-native-elements";
 import DropDownPicker from "react-native-dropdown-picker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
   const route = useRoute();
@@ -212,27 +213,59 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
             {/* Start Date */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Start Date</Text>
-              {
+              {Platform.OS === 'web' ? (
                 <Input
                   type="date"
                   value={startDateInput}
                   onChange={(e) => setStartDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
-              }
+              ) : (
+                <>
+                  <Pressable
+                    style={styles.dateButton}
+                    onPress={() => setIsStartPickerOpen(true)}
+                  >
+                    <Text>{startDateInput}</Text>
+                  </Pressable>
+                  <DateTimePickerModal
+                    isVisible={isStartPickerOpen}
+                    mode="date"
+                    onConfirm={handleStartDateConfirm}
+                    onCancel={() => setIsStartPickerOpen(false)}
+                    date={new Date(startDateInput)}
+                  />
+                </>
+              )}
             </View>
 
             {/* End Date */}
-            <View style={[styles.formGroup]}>
+            <View style={styles.formGroup}>
               <Text style={styles.label}>End Date</Text>
-              {
+              {Platform.OS === 'web' ? (
                 <Input
                   type="date"
                   value={endDateInput}
                   onChange={(e) => setEndDateInput(e.target.value)}
                   style={styles.webDateInput}
                 />
-              }
+              ) : (
+                <>
+                  <Pressable
+                    style={styles.dateButton}
+                    onPress={() => setIsEndPickerOpen(true)}
+                  >
+                    <Text>{endDateInput}</Text>
+                  </Pressable>
+                  <DateTimePickerModal
+                    isVisible={isEndPickerOpen}
+                    mode="date"
+                    onConfirm={handleEndDateConfirm}
+                    onCancel={() => setIsEndPickerOpen(false)}
+                    date={new Date(endDateInput)}
+                  />
+                </>
+              )}
             </View>
 
             {/* Buttons */}
@@ -481,3 +514,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+
+  const handleStartDateConfirm = (date) => {
+    setIsStartPickerOpen(false);
+    const dateString = date.toISOString().split('T')[0];
+    setStartDateInput(dateString);
+    setHabitData(prev => ({ ...prev, startDate: date }));
+  };
+
+  const handleEndDateConfirm = (date) => {
+    setIsEndPickerOpen(false);
+    const dateString = date.toISOString().split('T')[0];
+    setEndDateInput(dateString);
+    setHabitData(prev => ({ ...prev, endDate: date }));
+  };
