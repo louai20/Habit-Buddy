@@ -196,21 +196,19 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
             onChange={(e) => setStartDateInput(e.target.value)}
             style={styles.webDateInput}
           />
-        ) : (
+        ) : Platform.OS === 'android' ? (
           <>
-            {/* Button to trigger the picker */}
             <Pressable onPress={() => setIsStartPickerOpen(true)} style={styles.dateButton}>
               <Text style={styles.dateButtonText}>{startDateInput || 'Select Start Date'}</Text>
             </Pressable>
-            {/* Conditionally render the DateTimePicker */}
             {isStartPickerOpen && (
               <DateTimePicker
                 value={habitData.startDate}
                 mode="date"
-                display="default" // Or "spinner", "calendar"
+                display="default"
                 onChange={(event, selectedDate) => {
-                  setIsStartPickerOpen(false); // Close picker regardless of action
-                  if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                  setIsStartPickerOpen(false);
+                  if (event.type === 'set' && selectedDate) {
                     const dateString = selectedDate.toISOString().split('T')[0];
                     setStartDateInput(dateString);
                     setHabitData(prev => ({ ...prev, startDate: selectedDate }));
@@ -219,6 +217,20 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
               />
             )}
           </>
+        ) : (
+          <DateTimePicker
+            value={habitData.startDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setIsStartPickerOpen(false);
+              if (selectedDate) {
+                const dateString = selectedDate.toISOString().split('T')[0];
+                setStartDateInput(dateString);
+                setHabitData(prev => ({ ...prev, startDate: selectedDate }));
+              }
+            }}
+          />
         )}
       </View>
 
@@ -232,22 +244,20 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
             onChange={(e) => setEndDateInput(e.target.value)}
             style={styles.webDateInput}
           />
-        ) : (
+        ) : Platform.OS === 'android' ? (
           <>
-            {/* Button to trigger the picker */}
             <Pressable onPress={() => setIsEndPickerOpen(true)} style={styles.dateButton}>
               <Text style={styles.dateButtonText}>{endDateInput || 'Select End Date'}</Text>
             </Pressable>
-            {/* Conditionally render the DateTimePicker */}
             {isEndPickerOpen && (
               <DateTimePicker
                 value={habitData.endDate}
                 mode="date"
-                display="default" // Or "spinner", "calendar"
-                minimumDate={habitData.startDate} // Keep minimum date logic
+                display="default"
+                minimumDate={habitData.startDate}
                 onChange={(event, selectedDate) => {
-                  setIsEndPickerOpen(false); // Close picker regardless of action
-                  if (event.type === 'set' && selectedDate) { // Check for 'set' event on Android
+                  setIsEndPickerOpen(false);
+                  if (event.type === 'set' && selectedDate) {
                     const dateString = selectedDate.toISOString().split('T')[0];
                     setEndDateInput(dateString);
                     setHabitData(prev => ({ ...prev, endDate: selectedDate }));
@@ -256,6 +266,21 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
               />
             )}
           </>
+        ) : (
+          <DateTimePicker
+            value={habitData.endDate}
+            mode="date"
+            display="default"
+            minimumDate={habitData.startDate}
+            onChange={(event, selectedDate) => {
+              setIsEndPickerOpen(false);
+              if (selectedDate) {
+                const dateString = selectedDate.toISOString().split('T')[0];
+                setEndDateInput(dateString);
+                setHabitData(prev => ({ ...prev, endDate: selectedDate }));
+              }
+            }}
+          />
         )}
       </View>
 

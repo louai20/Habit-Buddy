@@ -7,16 +7,24 @@ import {
   Alert,
   Platform,
   StyleSheet,
+  FlatList,
   ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Input } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { SelectList } from "react-native-dropdown-select-list"; // Change this import
+import DropDownPicker from "react-native-dropdown-picker";
 
 export function AddHabitView({ user, onSetHabit }) {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Add open state for DropDownPicker
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    { label: "Daily", value: "Daily" },
+    { label: "Weekly", value: "Weekly" },
+    { label: "Monthly", value: "Monthly" },
+  ]);
 
   const [habitData, setHabitData] = useState({
     name: "",
@@ -109,127 +117,190 @@ export function AddHabitView({ user, onSetHabit }) {
     }
   };
 
-  // Remove these states as they're not needed anymore
-  // const [open, setOpen] = useState(false);
-  // const [items, setItems] = useState([...]);
-
   const frequencies = [
     { key: "Daily", value: "Daily" },
     { key: "Weekly", value: "Weekly" },
     { key: "Monthly", value: "Monthly" },
   ];
 
+  // Add renderForm function before the return statement
+  const renderForm = () => (
+    <>
+      {/* Name */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Habit Name</Text>
+        <TextInput
+          style={styles.input}
+          value={habitData.name}
+          onChangeText={(text) => handleInputChange("name", text)}
+          placeholder="e.g., Meditate"
+        />
+      </View>
+
+      {/* Description */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={habitData.description}
+          onChangeText={(text) => handleInputChange("description", text)}
+          placeholder="What is this habit about?"
+          multiline
+          numberOfLines={4}
+        />
+      </View>
+
+      {/* Start Date */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Start Date</Text>
+        {Platform.OS === "web" ? (
+          <Input
+            type="date"
+            value={startDateInput}
+            onChange={(e) => setStartDateInput(e.target.value)}
+            style={styles.webDateInput}
+          />
+        ) : Platform.OS === "android" ? (
+          <>
+            <Pressable
+              onPress={() => setIsStartPickerOpen(true)}
+              style={styles.dateButton}
+            >
+              <Text style={styles.dateButtonText}>
+                {startDateInput || "Select Start Date"}
+              </Text>
+            </Pressable>
+            {isStartPickerOpen && (
+              <DateTimePicker
+                value={habitData.startDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setIsStartPickerOpen(false);
+                  if (event.type === "set" && selectedDate) {
+                    setStartDateInput(selectedDate.toISOString().split("T")[0]);
+                    setHabitData((prev) => ({
+                      ...prev,
+                      startDate: selectedDate,
+                    }));
+                  }
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <DateTimePicker
+            value={habitData.startDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              if (selectedDate) {
+                setStartDateInput(selectedDate.toISOString().split("T")[0]);
+                setHabitData((prev) => ({
+                  ...prev,
+                  startDate: selectedDate,
+                }));
+              }
+            }}
+          />
+        )}
+      </View>
+
+      {/* End Date */}
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>End Date</Text>
+        {Platform.OS === "web" ? (
+          <Input
+            type="date"
+            value={endDateInput}
+            onChange={(e) => setEndDateInput(e.target.value)}
+            style={styles.webDateInput}
+          />
+        ) : Platform.OS === "android" ? (
+          <>
+            <Pressable
+              onPress={() => setIsEndPickerOpen(true)}
+              style={styles.dateButton}
+            >
+              <Text style={styles.dateButtonText}>
+                {endDateInput || "Select End Date"}
+              </Text>
+            </Pressable>
+            {isEndPickerOpen && (
+              <DateTimePicker
+                value={habitData.endDate}
+                mode="date"
+                display="default"
+                minimumDate={habitData.startDate}
+                onChange={(event, selectedDate) => {
+                  setIsEndPickerOpen(false);
+                  if (event.type === "set" && selectedDate) {
+                    setEndDateInput(selectedDate.toISOString().split("T")[0]);
+                    setHabitData((prev) => ({ ...prev, endDate: selectedDate }));
+                  }
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <DateTimePicker
+            value={habitData.endDate}
+            mode="date"
+            display="default"
+            minimumDate={habitData.startDate}
+            onChange={(event, selectedDate) => {
+              if (selectedDate) {
+                setEndDateInput(selectedDate.toISOString().split("T")[0]);
+                setHabitData((prev) => ({ ...prev, endDate: selectedDate }));
+              }
+            }}
+          />
+        )}
+      </View>
+
+      {/* Frequency */}
+      <View style={[styles.formGroup, { zIndex: 1000 }]}>
+        <Text style={styles.label}>Frequency</Text>
+        <DropDownPicker
+          open={open}
+          value={habitData.frequency}
+          items={items}
+          setOpen={setOpen}
+          setValue={(callback) => {
+            const value = callback(habitData.frequency);
+            handleInputChange("frequency", value);
+          }}
+          setItems={setItems}
+          style={styles.dropdownStyle}
+          dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={styles.dropdownText}
+          placeholder="Select frequency"
+        />
+      </View>
+
+      {/* Submit */}
+      <Pressable
+        style={[styles.button, isSubmitting && styles.buttonDisabled]}
+        onPress={handleSubmit}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.buttonText}>
+          {isSubmitting ? "Adding..." : "Add Habit"}
+        </Text>
+      </Pressable>
+    </>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {/* Name */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Habit Name</Text>
-          <TextInput
-            style={styles.input}
-            value={habitData.name}
-            onChangeText={(text) => handleInputChange("name", text)}
-            placeholder="e.g., Meditate"
-          />
-        </View>
-
-        {/* Description */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={habitData.description}
-            onChangeText={(text) => handleInputChange("description", text)}
-            placeholder="What is this habit about?"
-            multiline
-            numberOfLines={4}
-          />
-        </View>
-
-        {/* Frequency */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Frequency</Text>
-          <SelectList
-            setSelected={(value) => handleInputChange("frequency", value)}
-            data={frequencies}
-            save="value"
-            defaultOption={{
-              key: habitData.frequency,
-              value: habitData.frequency,
-            }}
-            search={false}
-            boxStyles={styles.selectBox}
-            dropdownStyles={styles.dropdownContainer}
-            dropdownItemStyles={styles.dropdownItem}
-            dropdownTextStyles={styles.dropdownText}
-          />
-        </View>
-
-        {/* Start Date */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Start Date</Text>
-          {Platform.OS === "web" ? (
-            <Input
-              type="date"
-              value={startDateInput}
-              onChange={(e) => setStartDateInput(e.target.value)}
-              style={styles.webDateInput}
-            />
-          ) : (
-            <DateTimePicker
-              value={habitData.startDate}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setStartDateInput(selectedDate.toISOString().split("T")[0]);
-                  setHabitData((prev) => ({
-                    ...prev,
-                    startDate: selectedDate,
-                  }));
-                }
-              }}
-            />
-          )}
-        </View>
-
-        {/* End Date */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>End Date</Text>
-          {Platform.OS === "web" ? (
-            <Input
-              type="date"
-              value={endDateInput}
-              onChange={(e) => setEndDateInput(e.target.value)}
-              style={styles.webDateInput}
-            />
-          ) : (
-            <DateTimePicker
-              value={habitData.endDate}
-              mode="date"
-              display="default"
-              minimumDate={habitData.startDate}
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setEndDateInput(selectedDate.toISOString().split("T")[0]);
-                  setHabitData((prev) => ({ ...prev, endDate: selectedDate }));
-                }
-              }}
-            />
-          )}
-        </View>
-
-        {/* Submit */}
-        <Pressable
-          style={[styles.button, isSubmitting && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          <Text style={styles.buttonText}>
-            {isSubmitting ? "Adding..." : "Add Habit"}
-          </Text>
-        </Pressable>
-      </ScrollView>
+      <FlatList
+        data={[1]} // Dummy data array with one item
+        renderItem={renderForm}
+        keyExtractor={() => 'add-form'}
+        style={styles.formScroll}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      />
     </View>
   );
 }
@@ -319,5 +390,27 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: "#93c5fd", // lighter blue when disabled
     opacity: 0.7,
+  },
+  dropdownStyle: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderColor: "#e5e7eb",
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dropdownContainer: {
+    backgroundColor: "#fff",
+    borderColor: "#e5e7eb",
+    borderWidth: 1,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  dropdownText: {
+    color: "#374151",
+    fontSize: 16,
   },
 });
