@@ -114,15 +114,24 @@ export function HabitTrackerView({
       .filter(date => markedDates[date].selectedColor === '#059669')
       .sort();
     
+    // Handle edge case of no completed dates
+    if (completedDates.length === 0) {
+      return 0;
+    }
+    
     let currentStreak = 1;
     let longestStreak = 1;
     
     for (let i = 1; i < completedDates.length; i++) {
-      const currentDate = new Date(completedDates[i]);
-      const prevDate = new Date(completedDates[i - 1]);
+      // Use date strings directly for comparison instead of creating Date objects
+      const currentDateStr = completedDates[i];
+      const prevDateStr = completedDates[i - 1];
       
-      // Check if dates are consecutive
-      const diffDays = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+      // Calculate difference using a more efficient method
+      const currentDate = new Date(currentDateStr);
+      const prevDate = new Date(prevDateStr);
+      const diffTime = currentDate.getTime() - prevDate.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
       
       if (diffDays === 1) {
         currentStreak++;
