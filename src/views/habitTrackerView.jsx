@@ -108,6 +108,33 @@ export function HabitTrackerView({
     return (completedDates / totalDays) * 100;
   };
 
+  // Add this function after calculateProgress
+  const calculateLongestStreak = () => {
+    const completedDates = Object.keys(markedDates)
+      .filter(date => markedDates[date].selectedColor === '#059669')
+      .sort();
+    
+    let currentStreak = 1;
+    let longestStreak = 1;
+    
+    for (let i = 1; i < completedDates.length; i++) {
+      const currentDate = new Date(completedDates[i]);
+      const prevDate = new Date(completedDates[i - 1]);
+      
+      // Check if dates are consecutive
+      const diffDays = (currentDate - prevDate) / (1000 * 60 * 60 * 24);
+      
+      if (diffDays === 1) {
+        currentStreak++;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 1;
+      }
+    }
+    
+    return longestStreak;
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Track Your Habit</Text>
@@ -140,6 +167,11 @@ export function HabitTrackerView({
             ).length
           }{" "}
           times
+        </Text>
+        
+        {/* Add Longest Streak */}
+        <Text style={styles.habitStreak}>
+          Longest Streak: {calculateLongestStreak()} days
         </Text>
       </View>
 
