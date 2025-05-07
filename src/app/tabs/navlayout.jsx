@@ -3,7 +3,6 @@ import { Text } from 'react-native';
 import DashboardPresenter from  '../../presenters/dashboardPresenter'
 import RegisterPresenter from '../../presenters/registerPresenter';
 import LoginPresenter from '../../presenters/loginPresenter';
-import MotivationPage from '../../components/MotivationPage';
 import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import ProgressPresenter from "../../presenters/progressPresenter";
@@ -76,14 +75,6 @@ export default function TabsLayout() {
             title: 'Edit Habit',
             //tabBarIcon: () => <Text>✏️</Text>,
             tabBarButton: () => null,
-          }}
-        />
-        <Tab.Screen
-          name="motivation"
-          component={MotivationPage}
-          options={{
-            tabBarButton: () => null, // Hides the tab
-            headerShown: false,
           }}
         />
         <Tab.Screen
