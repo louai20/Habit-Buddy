@@ -2,67 +2,103 @@ import React from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 
-const ProgressView = ({ habits, dailyCompletion, dayLabels }) => {
+const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
+  const today = new Date().toISOString().split("T")[0];
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>📈 Your Progress</Text>
 
-      <Text style={styles.stat}>Total Habits: {habits.length}</Text>
-      <Text style={styles.stat}>
-        Habits Completed Today:{" "}
-        {habits.filter((habit) =>
-          (habit.completedDates || []).includes(
-            new Date().toISOString().split("T")[0]
-          )
-        ).length}
-      </Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Habits Completed Today</Text>
+        <Text style={styles.cardValue}>
+          {
+            habits.filter((h) => h.completedDates?.includes(today)).length
+          }
+        </Text>
+      </View>
 
-      <Text style={styles.chartTitle}>Completions in the Last 7 Days</Text>
-      <BarChart
-        data={{
-          labels: dayLabels,
-          datasets: [{ data: dailyCompletion }],
-        }}
-        width={Dimensions.get("window").width - 40}
-        height={220}
-        fromZero
-        yAxisLabel=""
-        segments={4}
-        showValuesOnTopOfBars={true}
-        withInnerLines={false}
-        chartConfig={{
-          backgroundGradientFrom: "#fff",
-          backgroundGradientTo: "#fff",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
-          labelColor: () => "#555",
-        }}
-        style={{ marginTop: 10, borderRadius: 10 }}
-      />
-    </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Total Habits</Text>
+        <Text style={styles.cardValue}>{habits.length}</Text>
+      </View>
+
+      <View style={styles.chartCard}>
+        <Text style={styles.chartTitle}>Weekly Completions</Text>
+        <BarChart
+          data={{
+            labels: dayLabels,
+            datasets: [{ data: dailyCompletion.map(Number) }],
+          }}
+          width={Dimensions.get("window").width - 40}
+          height={220}
+          fromZero
+          yAxisLabel=""
+          showValuesOnTopOfBars={true}
+          withInnerLines={false}
+          chartConfig={{
+            backgroundGradientFrom: "#fff",
+            backgroundGradientTo: "#fff",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
+            labelColor: () => "#555",
+          }}
+          formatYLabel={(yValue) => {
+            const val = parseInt(yValue);
+            return val >= 4 ? "4+" : String(val);
+          }}
+          style={{ marginTop: 10, borderRadius: 10 }}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
+    flex: 1,
   },
-  title: {
+  header: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 16,
+    alignSelf: "center",
+    marginBottom: 10,
   },
-  stat: {
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    padding: 20,
+    boxShadowColor: "#000",
+    boxShadowOpacity: 0.1,
+    boxShadowRadius: 4,
+    elevation: 3,
+    marginBottom: 15,
+  },
+  cardTitle: {
     fontSize: 16,
-    marginBottom: 6,
+    color: "#555",
+  },
+  cardValue: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 5,
+  },
+  chartCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    padding: 20,
+    boxShadowColor: "#000",
+    boxShadowOpacity: 0.1,
+    boxShadowRadius: 4,
+    elevation: 3,
+    marginBottom: 20,
   },
   chartTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 10,
+    color: "#333",
+    marginBottom: 5,
   },
 });
 
