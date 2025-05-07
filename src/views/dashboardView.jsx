@@ -101,6 +101,11 @@ export function DashboardView({ habits }) {
           👋 Welcome Back{user?.name ? `, ${user.name}` : ''}!
         </Text>
         <Text style={styles.subGreeting}>Let’s make today productive 💪</Text>
+        <img
+          src="https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=Sara"
+          alt="Avatar"
+          style={styles.avatar}
+        />
       </View>
 
       {/* Quote Section */}
@@ -302,6 +307,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginBottom: 4,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginTop: 22,
+    marginBottom: 12,
   },
   progressContainer: {
     flexDirection: 'row',
