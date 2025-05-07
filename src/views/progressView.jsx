@@ -1,124 +1,69 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
-import { useSelector } from "react-redux";
 import { BarChart } from "react-native-chart-kit";
-import { format, subDays } from "date-fns";
 
-const Dashboard = () => {
-  const habits = useSelector((state) => state.habits.habits);
-
-  // completed count for each of the last 7 days
-  const last7Days = Array.from({ length: 7 }, (_, i) =>
-    format(subDays(new Date(), 6 - i), "yyyy-MM-dd")
-  );
-  const dayLabels = last7Days.map((d) => format(new Date(d), "EEE"));
-
-  const dailyCompletion = last7Days.map((date) => {
-    const uniqueHabitCompletions = new Set();
-  
-    habits.forEach((habit) => {
-      if (habit.completedDates?.includes(date)) {
-        uniqueHabitCompletions.add(habit.id); 
-      }
-    });
-  
-    return uniqueHabitCompletions.size;
-  });  
-
+const ProgressView = ({ habits, dailyCompletion, dayLabels }) => {
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.header}>📈 Your Progress</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Habits Completed Today</Text>
-        <Text style={styles.cardValue}>
-          {
-            habits.filter((h) =>
-              h.completedDates?.includes(new Date().toISOString().split("T")[0])
-            ).length
-          }
-        </Text>
-      </View>
+      <Text style={styles.stat}>Total Habits: {habits.length}</Text>
+      <Text style={styles.stat}>
+        Habits Completed Today:{" "}
+        {habits.filter((habit) =>
+          (habit.completedDates || []).includes(
+            new Date().toISOString().split("T")[0]
+          )
+        ).length}
+      </Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total Habits</Text>
-        <Text style={styles.cardValue}>{habits.length}</Text>
-      </View>
-
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Weekly Completions</Text>
-        <BarChart
-          data={{
-            labels: dayLabels,
-            datasets: [{ data: dailyCompletion.map(Number) }],
-          }}
-          width={Dimensions.get("window").width - 40}
-          height={220}
-          fromZero
-          yAxisLabel=""
-          showValuesOnTopOfBars={true}
-          withInnerLines={false}
-          chartConfig={{
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
-            labelColor: () => "#555",
-          }}
-          style={{ marginTop: 10, borderRadius: 10 }}
-        />
-      </View>
-    </ScrollView>
+      <Text style={styles.chartTitle}>Completions in the Last 7 Days</Text>
+      <BarChart
+        data={{
+          labels: dayLabels,
+          datasets: [{ data: dailyCompletion }],
+        }}
+        width={Dimensions.get("window").width - 40}
+        height={220}
+        fromZero
+        yAxisLabel=""
+        segments={4}
+        showValuesOnTopOfBars={true}
+        withInnerLines={false}
+        chartConfig={{
+          backgroundGradientFrom: "#fff",
+          backgroundGradientTo: "#fff",
+          decimalPlaces: 0,
+          color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
+          labelColor: () => "#555",
+        }}
+        style={{ marginTop: 10, borderRadius: 10 }}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: "#f5f5f5",
     flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
   },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
-    alignSelf: "center",
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    padding: 20,
-    boxShadowColor: "#000",
-    boxShadowOpacity: 0.1,
-    boxShadowRadius: 4,
-    elevation: 3,
-    marginBottom: 15,
-  },
-  cardTitle: {
+  stat: {
     fontSize: 16,
-    color: "#555",
-  },
-  cardValue: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 5,
-  },
-  chartCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    padding: 20,
-    boxShadowColor: "#000",
-    boxShadowOpacity: 0.1,
-    boxShadowRadius: 4,
-    elevation: 3,
-    marginBottom: 20,
+    marginBottom: 6,
   },
   chartTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
-    color: "#333",
-    marginBottom: 5,
+    marginTop: 20,
+    marginBottom: 10,
   },
 });
 
-export default Dashboard;
+export default ProgressView;
