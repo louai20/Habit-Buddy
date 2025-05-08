@@ -1,9 +1,17 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
-import { BarChart } from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 
 const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
   const today = new Date().toISOString().split("T")[0];
+
+  // turn all values into numbers
+  const numbers = dailyCompletion.map(Number);
+  // find the max, defaulting to at least 1 so we always get a y-axis
+  const maxCompletion = Math.max(...numbers, 1);
+  // ensure at least two segments so we get both 0 and 1 labeled
+  const segments = Math.max(maxCompletion, 2);
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>📈 Your Progress</Text>
@@ -11,9 +19,7 @@ const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Habits Completed Today</Text>
         <Text style={styles.cardValue}>
-          {
-            habits.filter((h) => h.completedDates?.includes(today)).length
-          }
+          {habits.filter((h) => h.completedDates?.includes(today)).length}
         </Text>
       </View>
 
@@ -24,28 +30,29 @@ const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
 
       <View style={styles.chartCard}>
         <Text style={styles.chartTitle}>Weekly Completions</Text>
-        <BarChart
+        <LineChart
           data={{
             labels: dayLabels,
-            datasets: [{ data: dailyCompletion.map(Number) }],
+            datasets: [{ data: numbers }],
           }}
           width={Dimensions.get("window").width - 40}
           height={220}
-          fromZero
-          yAxisLabel=""
-          showValuesOnTopOfBars={true}
-          withInnerLines={false}
+          fromZero                    // start Y-axis at zero
+          segments={segments}         
+          yAxisInterval={1}           // label every integer
           chartConfig={{
             backgroundGradientFrom: "#fff",
             backgroundGradientTo: "#fff",
             decimalPlaces: 0,
             color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
             labelColor: () => "#555",
+            propsForDots: {
+              r: "5",
+              strokeWidth: "2",
+              stroke: "#3f51b5",
+            },
           }}
-          formatYLabel={(yValue) => {
-            const val = parseInt(yValue);
-            return val >= 4 ? "4+" : String(val);
-          }}
+          bezier
           style={{ marginTop: 10, borderRadius: 10 }}
         />
       </View>
@@ -69,9 +76,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 20,
-    boxShadowColor: "#000",
-    boxShadowOpacity: 0.1,
-    boxShadowRadius: 4,
     elevation: 3,
     marginBottom: 15,
   },
@@ -88,9 +92,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 20,
-    boxShadowColor: "#000",
-    boxShadowOpacity: 0.1,
-    boxShadowRadius: 4,
     elevation: 3,
     marginBottom: 20,
   },
