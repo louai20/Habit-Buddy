@@ -23,6 +23,7 @@ const AuthPresenter = ({ user, loading, error, onLogout, onSetUser }) => {
               name: userData.name,
               email: userData.email,
               photoURL: userData.photoURL,
+              avatarSeed: userData.avatarSeed || 'Easton',
             });
           } else {
             console.error('User does not exist');

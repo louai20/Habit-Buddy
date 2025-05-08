@@ -27,6 +27,7 @@ export const registerWithEmail = createAsyncThunk("auth/registerWithEmail", asyn
       name: user.displayName,
       email: user.email,
       photoURL: user.photoURL,
+      avatarSeed: 'Easton',
     };
 
     // Save user data to Firestore
