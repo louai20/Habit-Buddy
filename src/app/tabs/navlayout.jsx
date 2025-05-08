@@ -8,6 +8,7 @@ import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import ProgressPresenter from "../../presenters/progressPresenter";
 import HabitPresenter from "../../presenters/habitPresenter";
 import HabitTrackerPresenter from "../../presenters/habitTrackerPresenter";
+import AvatarPickerView from "../../views/avatarPickerView";
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,15 @@ export default function TabsLayout() {
           options={{
             tabBarButton: () => null, // Hides the tab
             headerShown: false,
+          }}
+        />
+        <Tab.Screen
+          name="avatarPicker"
+          component={AvatarPickerView}
+          options={{
+            title: 'Pick Avatar',
+            headerTitle: 'Choose Your Avatar',
+            tabBarButton: () => null,    // hide from tab bar
           }}
         />
         <Tab.Screen

@@ -9,6 +9,7 @@ const initialState = {
   loading: false,
   error: null,
   token: null,
+  avatarSeed: 'Easton',
 };
 
 // Register with Email
@@ -82,6 +83,11 @@ const authSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
+    // Avatar
+    setAvatarSeed: (state, action) => {
+      // update the avatarSeed on the user object
+      state.user.avatarSeed = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -106,5 +112,5 @@ const authSlice = createSlice({
       })
   },
 });
-export const { setUser, setLoading, setError } = authSlice.actions;
+export const { setUser, setLoading, setError, setAvatarSeed } = authSlice.actions;
 export default authSlice.reducer;

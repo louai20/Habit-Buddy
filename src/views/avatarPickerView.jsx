@@ -1,25 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Button, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import AvatarPicker from '../components/AvatarPicker';
+import AvatarPicker from '../components/avatarPicker';
 import { setAvatarSeed } from '../models/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function AvatarPickerView() {
   const dispatch = useDispatch();
-  const currentSeed = useSelector((state) => state.auth.user?.avatarSeed || 'Sarah');
+  const currentSeed = useSelector(s => s.auth.user?.avatarSeed || 'Easton');
   const [selectedSeed, setSelectedSeed] = useState(currentSeed);
+  const navigation = useNavigation();
 
-  const handleSave = () => {
-    dispatch(setAvatarSeed(selectedSeed));
-    alert('Avatar updated!');
-  };
+    const handleSave = async () => {
+      // 1) update Redux
+      dispatch(setAvatarSeed(selectedSeed));
+      // 2) persist to device storage
+      await AsyncStorage.setItem('avatarSeed', selectedSeed);
+      // 3) go back to dashboard
+      navigation.goBack();
+    };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose Your Avatar</Text>
       
       <Image
-        source={{ uri: `https://api.dicebear.com/7.x/adventurer-neutral/png?seed=${selectedSeed}` }}
+        source={{ uri: `https://api.dicebear.com/9.x/adventurer/svg?seed=${selectedSeed}` }}
         style={styles.preview}
       />
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Button, ScrollView, Image } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQuote } from '../models/quotesSlice';
 import { fetchWeather } from '../models/weatherSlice';
@@ -101,11 +101,18 @@ export function DashboardView({ habits }) {
           👋 Welcome Back{user?.name ? `, ${user.name}` : ''}!
         </Text>
         <Text style={styles.subGreeting}>Let’s make today productive 💪</Text>
-        <img
-          src="https://api.dicebear.com/9.x/adventurer/png?seed=${user.avatarSeed}"
-          alt="Avatar"
+        <Image
+          source={{
+            uri: `https://api.dicebear.com/9.x/adventurer/svg?seed=${user?.avatarSeed || 'Easton'}`,
+          }}
           style={styles.avatar}
         />
+        <View style={styles.changeButton}>
+          <Button
+            title="Change Avatar"
+            onPress={() => navigation.navigate('avatarPicker')}
+          />
+        </View>
       </View>
 
       {/* Quote Section */}
@@ -288,6 +295,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
     color: '#1a1a1a',
+  },
+  changeButton: {
+    width: 140,
+    marginTop: 5,
   },
   habitGrid: {
     flexDirection: 'row',
