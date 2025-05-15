@@ -181,15 +181,6 @@ export function DashboardView({ habits }) {
           </>
         ) : null}
       </View>
-      {/* 📅 Calendar Section */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📆 Habit Calendar</Text>
-        <Calendar
-          style={styles.calendar}
-          markedDates={markedDates}
-          theme={calendarTheme}
-        />
-      </View>
 
       {/* Progress Section */}
       <View style={styles.progressContainer}>
