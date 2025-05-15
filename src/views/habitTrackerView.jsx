@@ -21,11 +21,12 @@ export function HabitTrackerView({
       const marked = {};
       const currentDate = new Date();
       const startDate = new Date(habitFromRoute.startDate);
+      const endDate = new Date(habitFromRoute.endDate);
 
       // Iterate through all dates from start to today
       for (
         let d = new Date(startDate);
-        d <= currentDate;
+        d <= currentDate && d <= endDate;
         d.setDate(d.getDate() + 1)
       ) {
         const dateString = d.toISOString().split("T")[0];
@@ -37,7 +38,7 @@ export function HabitTrackerView({
             selectedColor: "#059669",
           };
         } else if (d < currentDate) {
-          // Past uncompleted dates in orange
+          // Past uncompleted dates in orange (only if within range and before today)
           marked[dateString] = {
             selected: true,
             selectedColor: "#f97316",
@@ -56,10 +57,18 @@ export function HabitTrackerView({
     );
   }
 
-  // Handles the selection of a date in the calendar
-  // day: { dateString: string } - Object containing the selected date in ISO format
+
   const handleDateSelect = (day) => {
     const date = day.dateString;
+    const selectedDate = new Date(date);
+    const startDate = new Date(habitFromRoute.startDate);
+    const endDate = new Date(habitFromRoute.endDate);
+
+    // Check if the selected date is within the valid range
+    if (selectedDate < startDate || selectedDate > endDate) {
+      return; // Exit if date is outside valid range
+    }
+
     // Check if the date is already marked as completed (green)
     const isCompleted = markedDates[date]?.selectedColor === "#059669";
 
@@ -153,6 +162,14 @@ export function HabitTrackerView({
           Frequency: {habitFromRoute.frequency}
         </Text>
 
+        {/* Add Start and End Date */}
+        <Text style={styles.habitDates}>
+          Start Date: {new Date(habitFromRoute.startDate).toLocaleDateString()}
+        </Text>
+        <Text style={styles.habitDates}>
+          End Date: {new Date(habitFromRoute.endDate).toLocaleDateString()}
+        </Text>
+
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBarBackground}>
@@ -237,6 +254,11 @@ const styles = StyleSheet.create({
     color: "#1f2937",
   },
   habitFrequency: {
+    fontSize: 14,
+    color: "#4b5563",
+    marginBottom: 4,
+  },
+  habitDates: {
     fontSize: 14,
     color: "#4b5563",
     marginBottom: 4,
