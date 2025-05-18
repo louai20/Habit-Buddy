@@ -9,6 +9,7 @@ import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native';
 import { useState } from "react";
 import { useNavigation } from '@react-navigation/native';
+import WeatherCard from '../components/WeatherCard';
 
 export function DashboardView({ habits }) {
   const dispatch = useDispatch();
@@ -135,27 +136,11 @@ export function DashboardView({ habits }) {
 
       {/* Weather Section */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🌤️ Current Weather</Text>
+        <Text style={styles.sectionTitle}>🌤️ Weather</Text>
         {weatherLoading ? (
           <Text style={styles.loading}>Loading weather...</Text>
         ) : locationDenied ? (
-          <TouchableOpacity onPress={async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status === 'granted') {
-              try {
-                let location = await Location.getCurrentPositionAsync({});
-                dispatch(fetchWeather({
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                }));
-                setLocationDenied(false);
-              } catch (err) {
-                setLocationDenied(true); // Set state for error if location can't be fetched
-              }
-            } else {
-              setLocationDenied(true); // Optionally notify if the permission is still denied
-            }
-          }}>
+          <TouchableOpacity onPress={handleLocationRequest}>
             <Text style={styles.permissionPrompt}>
               📍 Location access needed. Tap here to allow.
             </Text>
@@ -163,22 +148,17 @@ export function DashboardView({ habits }) {
         ) : weatherError ? (
           <Text style={styles.error}>Weather error: {weatherError}</Text>
         ) : current ? (
-          <>
-            <Text style={styles.current}>Temperature {current.temperature}°C, Wind {current.windspeed} km/h</Text>
-            <Text style={styles.sectionTitle}>📅 7-Day Forecast</Text>
-            <View style={styles.forecastContainer}>
-              {forecast?.time?.map((date, index) => (
-                <View key={index} style={styles.forecastItem}>
-                  <Text style={styles.forecastDate}>
-                    {new Date(date).toLocaleDateString(undefined, { weekday: 'short' })}
-                  </Text>
-                  <Text style={styles.forecastTemp}>
-                    {forecast.temperature_2m_min[index]}° / {forecast.temperature_2m_max[index]}°
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </>
+          <WeatherCard
+            city={"Stockholm"}
+            currentTemp={current.temperature}
+            forecast={
+              forecast.time.slice(0, 5).map((date, index) => ({
+                day: new Date(date).toLocaleDateString(undefined, { weekday: 'short' }),
+                tempMin: forecast.temperature_2m_min[index],
+                tempMax: forecast.temperature_2m_max[index],
+              }))
+            }
+          />
         ) : null}
       </View>
 
