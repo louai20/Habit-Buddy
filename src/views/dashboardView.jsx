@@ -15,6 +15,8 @@ export function DashboardView({ habits }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const [city, setCity] = useState('');
+
   const user = useSelector((state) => state.auth.user); // Get username for the header
   const { quote, loading: quoteLoading, error: quoteError } = useSelector(state => state.quotes);
   const { current, forecast, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
@@ -51,6 +53,11 @@ export function DashboardView({ habits }) {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           }));
+
+          let address = await Location.reverseGeocodeAsync(location.coords);
+          if (address.length > 0) {
+            setCity(address[0].city || address[0].region || "Your City");
+          }
           setLocationDenied(false); // Reset if permission is granted
           setLocationError('');
           setHasAskedLocationPermission(true); // Mark as asked
