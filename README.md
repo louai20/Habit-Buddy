@@ -15,8 +15,8 @@ npm install
 yarn install
 ```
 
-3. Set up Firebase:
-   - Copy your Firebase configuration to `src/firebaseConfig.js`
+3. Set up environment variables::
+   - Create a .env file in the root directory and ask us for the variables.
 
 4. Start the development server:
 ```bash
@@ -40,49 +40,17 @@ A habit tracking application built with React Native that helps users create, ma
   - Edit existing habits
   - Delete unwanted habits
   - Progress overview for last 7 days
+  - Track each habit in a calendar
 
 - API
   - Motivational quotes
   - Weather data and forecast 
+  - Avatar selection
 
-## Planned Features
+## Third-party Components
 
-- Progress Tracking
-  -> Progress visualization for each habit
-
-- Social Features
-  -> Share habits with friends
-
-- User Experience
-  -> UI improvements for a better user experience
-
-## Issues need to be fixed
-
-1.Location Access for Weather (Mobile)
-
-  - Fix the location-related issue in the weather feature on mobile.
-
-  - Ensure no useEffect or any other logic in the View layer that violates the MVP pattern.
-
-2.DashboardView Refactor
-
-  - Refactor DashboardView so that useEffect, useState, and similar logic are handled in the Presenter layer, not in the View.
-
-3.Habits Feature (Edit and Add)
-
-  - Rewrite both Edit and Add Habit functionality to follow the MVP pattern correctly.
-
-  - Ensure there is no logic (like state or effects) in the View layer.
-
-4.Edit Habit View Issue on Mobile
-
-  - The edit screen does not display correctly on phones.
-
-  - Replace the current date input with DateTimePickerModal from react-native-modal-datetime-picker for better mobile support.
-
-5.Web – Date Deletion Error
-
-  - Fix the issue where deleting a date on the web causes an error.
+- DropDownPicker from "react-native-dropdown-picker";
+- DateTimePicker from '@react-native-community/datetimepicker';
 
 ## Project Structure
 
@@ -106,9 +74,6 @@ Screen for user registration. It shows the RegisterPresenter, responsible for th
 
 - navlayout.jsx
 Defines the bottom tab navigation for the app using React Navigation. It registers all major routes (Dashboard, Add Habit, Edit Habit, Progress, etc.) and hides secondary ones like login, register, and motivation using tabBarButton: () => null.
-
-- MotivationPage.jsx
-Displays a daily motivational quote and weather information. It fetches data from external APIs (quotesSlice and weatherSlice) and allows users to refresh the quote with a button.
 
 - authSlice.jsx
 Manages authentication state for the app.
@@ -185,6 +150,10 @@ Displays a motivational quote, current weather, 7-day forecast, user’s habits,
 Displays the user’s habit progress over time.
 Includes total habits, daily completions, and a weekly bar chart visualizing completions using react-native-chart-kit.
 
-- firebaseConfig.js
-Initializes and sets up Firebase for the app.
-It connects to Firebase services like Firestore and Authentication and exports them so they can be used throughout the project.
+- habitTrackerView.jsx
+Provides a detailed calendar interface for tracking individual habits.
+Features include a calendar with color-coded dates (green for completed, orange for missed), progress tracking with completion percentage, longest streak calculation, and date range validation. Supports both marking and unmarking habits as complete for specific dates.
+
+- habitPresenter.jsx
+Connects the HabitTrackerView to the Redux store.
+Manages the connection between the view and Redux state, handles user authentication checks, and provides habit data and action dispatchers (updateHabit, deleteHabit) to the view. Includes unauthorized view redirection for unauthenticated users.
