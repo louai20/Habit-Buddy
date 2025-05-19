@@ -17,22 +17,7 @@ export function AuthView(props) {
           </Pressable>
         </View>
       ) : (
-        <View>
-          <View style={styles.buttonContainer}>
-            <Pressable
-              style={styles.button}
-              onPress={() => navigation.navigate('login')}
-            >
-              <Text style={styles.buttonText}>Login with Email</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button, styles.registerButton]}
-              onPress={() => navigation.navigate('register')}
-            >
-              <Text style={styles.buttonText}>Register</Text>
-            </Pressable>
-          </View>
-        </View>
+[]
       )}
     </View>
   );

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { collection, getDoc, query, orderBy, addDoc, where, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from "../firebaseConfig";
+import { db } from "../firebaseCon";
 
 const DOCUMENT = "users";
 

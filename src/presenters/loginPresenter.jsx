@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { LoginView } from '../views/loginView';
 import { loginWithEmail } from '../models/authSlice';
-import { Alert } from 'react-native'; // Import Alert
+import { Alert, Platform } from 'react-native'; // Import Alert
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 const LoginPresenter = ({ login, loading, error, user }) => { // Remove navigation from props if using the hook
@@ -13,12 +13,19 @@ const LoginPresenter = ({ login, loading, error, user }) => { // Remove navigati
   useEffect(() => {
     // If user is logged in, show success alert and redirect
     if (user && user.name) { // Check if user and user.name exist
-      // Construct the message string first
       const successMessage = `Login successful! Welcome back, ${user.name}.`;
-      Alert.alert('Success', successMessage); // Show success alert with the user's name
-      navigation.navigate('dashboard'); // Navigate to the dashboard page
+      if (Platform.OS === 'web') {
+        window.alert(successMessage);
+      } else {
+        Alert.alert('Success', successMessage);
+      }
+      navigation.navigate('dashboard');
     } else if (user) { // Fallback if user exists but name doesn't
-      Alert.alert('Success', 'Login successful! Welcome back.');
+      if (Platform.OS === 'web') {
+        window.alert('Login successful! Welcome back.');
+      } else {
+        Alert.alert('Success', 'Login successful! Welcome back.');
+      }
       navigation.navigate('dashboard');
     }
   }, [user, navigation]);
@@ -27,14 +34,21 @@ const LoginPresenter = ({ login, loading, error, user }) => { // Remove navigati
   useEffect(() => {
     if (error) {
       // Show error alert if login fails
-      Alert.alert('Login Failed', error);
+      if (Platform.OS === 'web') {
+        window.alert('Login Failed: incorrect email or password\n' + error);
+      } else {
+        Alert.alert('Login Failed', 'Incorrect email or password.\n' + error);
+      }
     }
   }, [error]);
 
   const handleSubmit = () => {
     if (!email || !password) {
-      // Use Alert.alert for cross-platform compatibility
-      Alert.alert('Missing Information', 'Please fill in both email and password');
+      if (Platform.OS === 'web') {
+        window.alert('Missing Information: Please fill in both email and password');
+      } else {
+        Alert.alert('Missing Information', 'Please fill in both email and password');
+      }
       return;
     }
 

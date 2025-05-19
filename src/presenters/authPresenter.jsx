@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { logout, setUser } from '../models/authSlice'; // Your slice actions
 import { AuthView } from '../views/authView';
-import { db } from '../firebaseConfig'; // Firebase configuration
+import { db } from '../firebaseCon'; // Firebase configuration
 import { doc, getDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

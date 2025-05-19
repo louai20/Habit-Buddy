@@ -4,6 +4,7 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 export const LoginView = ({ email, password, onEmailChange, onPasswordChange, onSubmit, loading, error }) => {
   return (
     <View style={styles.container}>
+      <Text style={styles.login}>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -29,8 +30,9 @@ export const LoginView = ({ email, password, onEmailChange, onPasswordChange, on
 
 const styles = StyleSheet.create({
   container: { padding: 20, justifyContent: 'center', flex: 1 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 15, borderRadius: 5 },
+  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 15, borderRadius: 10 },
   button: { backgroundColor: '#007AFF', padding: 15, borderRadius: 5, alignItems: 'center' },
   buttonText: { color: '#fff', fontWeight: 'bold' },
   error: { color: 'red', textAlign: 'center', marginBottom: 10 },
+  login: { fontSize: 50, fontWeight: 'bold', marginBottom: 100, textAlign: 'center' },
 });
