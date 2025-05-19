@@ -3,14 +3,15 @@ import { getAuth, GoogleAuthProvider, initializeAuth, getReactNativePersistence 
 import { getFirestore } from "firebase/firestore";
 import { Platform } from "react-native";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyAovpeEyWYcqOhlqH-VfVfLgkJdzIoqfKg",
-  authDomain: "habitstracker-832f2.firebaseapp.com",
-  projectId: "habitstracker-832f2",
-  storageBucket: "habitstracker-832f2.firebasestorage.app",
-  messagingSenderId: "570259014928",
-  appId: "1:570259014928:web:19b28b48a8e648ca035195"
+  apiKey: Constants.expoConfig.extra.firebaseApiKey,
+  authDomain: Constants.expoConfig.extra.firebaseAuthDomain,
+  projectId: Constants.expoConfig.extra.firebaseProjectId,
+  storageBucket: Constants.expoConfig.extra.firebaseStorageBucket,
+  messagingSenderId: Constants.expoConfig.extra.firebaseMessagingSenderId,
+  appId: Constants.expoConfig.extra.firebaseAppId,
 };
 
 const app = initializeApp(firebaseConfig);
