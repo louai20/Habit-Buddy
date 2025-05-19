@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "expo start",
-    "dev_clear": "expo start --clear"
+    "dev_clear": "expo start --clear",
+    "build": "expo build:web"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
