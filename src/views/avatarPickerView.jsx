@@ -1,36 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Image, Button, StyleSheet } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
 import AvatarPicker from '../components/avatarPicker';
-import { setAvatarSeed } from '../models/authSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import avatarPickerPresenter from '../presenters/avatarPickerPresenter';
 
 export default function AvatarPickerView() {
-  const dispatch = useDispatch();
-  const currentSeed = useSelector(s => s.auth.user?.avatarSeed || 'Easton');
-  const [selectedSeed, setSelectedSeed] = useState(currentSeed);
-  const navigation = useNavigation();
-
-    const handleSave = async () => {
-      // 1) update Redux
-      dispatch(setAvatarSeed(selectedSeed));
-      // 2) persist to device storage
-      await AsyncStorage.setItem('avatarSeed', selectedSeed);
-      // 3) go back to dashboard
-      navigation.goBack();
-    };
+  const {
+    avatarSeeds,
+    selectedSeed,
+    previewUri,
+    handleSelect,
+    handleSave,
+  } = avatarPickerPresenter();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose Your Avatar</Text>
       
-      <Image
-        source={{ uri: `https://api.dicebear.com/9.x/adventurer/svg?seed=${selectedSeed}` }}
-        style={styles.preview}
-      />
+      <Image source={{ uri: previewUri }} style={styles.preview} />
 
-      <AvatarPicker onSelect={setSelectedSeed} />
+      <AvatarPicker seeds={avatarSeeds} onSelect={handleSelect} />
 
       <View style={styles.buttonWrapper}>
         <Button title="Save Avatar" onPress={handleSave} color="#007bff" />

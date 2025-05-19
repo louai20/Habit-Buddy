@@ -111,7 +111,7 @@ export function DashboardView({ habits }) {
         <Text style={styles.subGreeting}>Let’s make today productive 💪</Text>
         <Image
           source={{
-            uri: `https://api.dicebear.com/9.x/adventurer/svg?seed=${user?.avatarSeed || 'Easton'}`,
+            uri: `https://api.dicebear.com/9.x/adventurer/png?seed=${user?.avatarSeed || 'Easton'}`,
           }}
           style={styles.avatar}
         />

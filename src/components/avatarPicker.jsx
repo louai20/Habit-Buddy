@@ -9,7 +9,7 @@ export default function AvatarPicker({ onSelect }) {
       {avatarSeeds.map((seed) => (
         <TouchableOpacity key={seed} onPress={() => onSelect(seed)}>
           <Image
-            source={{ uri: `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}` }}
+            source={{ uri: `https://api.dicebear.com/9.x/adventurer/png?seed=${seed}` }}
             style={styles.avatar}
           />
         </TouchableOpacity>
