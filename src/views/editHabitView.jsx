@@ -120,7 +120,7 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
       } else {
         Alert.alert("Success", "Habit updated successfully!");
       }
-      navigation.navigate("habit");
+      navigation.navigate('MainTabs',{screen: "habit"});
     } catch (error) {
       Alert.alert("EditHabitView: Error updating habit:", error);
     } finally {
@@ -147,7 +147,7 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
       } else {
         Alert.alert("Success", "Habit deleted successfully!");
       }
-      navigation.navigate("habit");
+      navigation.navigate('MainTabs',{screen: "habit"});
     } catch (error) {
       if (Platform.OS === "web") {
         window.alert("Failed to delete habit. Please try again.");

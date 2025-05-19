@@ -19,14 +19,14 @@ const LoginPresenter = ({ login, loading, error, user }) => { // Remove navigati
       } else {
         Alert.alert('Success', successMessage);
       }
-      navigation.navigate('dashboard');
+      navigation.navigate('MainTabs', { screen: 'dashboard' });
     } else if (user) { // Fallback if user exists but name doesn't
       if (Platform.OS === 'web') {
         window.alert('Login successful! Welcome back.');
       } else {
         Alert.alert('Success', 'Login successful! Welcome back.');
       }
-      navigation.navigate('dashboard');
+      navigation.navigate('MainTabs', { screen: 'dashboard' });
     }
   }, [user, navigation]);
 

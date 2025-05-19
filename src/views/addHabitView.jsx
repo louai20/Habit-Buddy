@@ -105,7 +105,7 @@ export function AddHabitView({ user, onSetHabit }) {
         startDate: new Date(),
         endDate: new Date(),
       });
-      navigation.navigate("dashboard");
+      navigation.navigate('MainTabs', { screen: 'dashboard' });
     } catch (error) {
       if (Platform.OS === "web") {
         window.alert("Failed to add habit. Please try again.");

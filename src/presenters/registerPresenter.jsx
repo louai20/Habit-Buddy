@@ -16,7 +16,7 @@ const RegisterPresenter = ({ register, loading, error, user }) => { // Add user 
     if (user) {
       // Show success alert before navigating
       Alert.alert('Success', `Registration successful! Welcome, ${user.name}.`);
-      navigation.navigate('dashboard'); // Navigate to dashboard on successful registration/login
+      navigation.navigate('MainTabs', { screen: 'dashboard' }); // Navigate to dashboard on successful registration/login
     }
   }, [user, navigation]);
 

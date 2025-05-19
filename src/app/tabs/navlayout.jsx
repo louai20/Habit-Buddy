@@ -1,100 +1,66 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Text } from 'react-native';
-import DashboardPresenter from  '../../presenters/dashboardPresenter'
+import DashboardPresenter from  '../../presenters/dashboardPresenter';
+import ProgressPresenter from "../../presenters/progressPresenter";
+import HabitPresenter from "../../presenters/habitPresenter";
+// Import the screens you want to show as stack screens
 import RegisterPresenter from '../../presenters/registerPresenter';
 import LoginPresenter from '../../presenters/loginPresenter';
 import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
-import ProgressPresenter from "../../presenters/progressPresenter";
-import HabitPresenter from "../../presenters/habitPresenter";
 import HabitTrackerPresenter from "../../presenters/habitTrackerPresenter";
 import AvatarPickerView from "../../views/avatarPickerView";
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        style: { justifyContent: 'space-around' }
+      }}
+    >
+      <Tab.Screen
+        name="dashboard"
+        component={DashboardPresenter}
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: () => <Text>📊</Text>,
+        }}
+      />
+      <Tab.Screen
+        name="habit"
+        component={HabitPresenter}
+        options={{
+          title: 'Habit',
+          tabBarIcon: () => <Text>📝</Text>,
+        }}
+      />
+      <Tab.Screen
+        name="progress"
+        component={ProgressPresenter}
+        options={{
+          title: 'Progress',
+          tabBarIcon: () => <Text>📊</Text>,
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 export default function TabsLayout() {
   return (
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: true,
-          style: { justifyContent: 'space-around' }
-        }}
-      >
-        <Tab.Screen
-          name="dashboard"
-          component={DashboardPresenter}
-          options={{
-            title: 'Dashboard',
-            tabBarIcon: () => <Text>📊</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="register"
-          component={RegisterPresenter}
-          options={{
-            tabBarButton: () => null, // Hides the tab
-            headerShown: false,
-          }}
-        />
-        <Tab.Screen
-          name="avatarPicker"
-          component={AvatarPickerView}
-          options={{
-            title: 'Pick Avatar',
-            headerTitle: 'Choose Your Avatar',
-            tabBarButton: () => null,    // hide from tab bar
-          }}
-        />
-        <Tab.Screen
-          name="addHabit"
-          component={AddHabitPresenter}
-          options={{
-            title: 'Add Habit',
-            //tabBarIcon: () => <Text>📝</Text>,
-            tabBarButton: () => null, // Hides the tab
-          }}
-        />
-        <Tab.Screen
-          name="habit"
-          component={HabitPresenter}
-          options={{
-            title: 'Habit',
-            tabBarIcon: () => <Text>📝</Text>,
-          }}
-        />
-        <Tab.Screen
-          name="habitTracker"
-          component={HabitTrackerPresenter}
-          options={{
-            title: 'Habit Tracker',
-            tabBarButton: () => null,
-          }}
-        />
-        <Tab.Screen
-          name="login"
-          component={LoginPresenter}
-          options={{
-            tabBarButton: () => null, // Hides the tab
-            headerShown: false,
-          }}
-        />
-        <Tab.Screen
-          name="editHabit"
-          component={EditHabitPresenter}
-          options={{
-            title: 'Edit Habit',
-            //tabBarIcon: () => <Text>✏️</Text>,
-            tabBarButton: () => null,
-          }}
-        />
-        <Tab.Screen
-          name="progress"
-          component={ProgressPresenter}
-          options={{
-            title: 'Progress',
-            tabBarIcon: () => <Text>📊</Text>,
-          }}
-        />
-      </Tab.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={MainTabs} />
+      <Stack.Screen name="register" component={RegisterPresenter} />
+      <Stack.Screen name="login" component={LoginPresenter} />
+      <Stack.Screen name="addHabit" component={AddHabitPresenter} />
+      <Stack.Screen name="editHabit" component={EditHabitPresenter} />
+      <Stack.Screen name="habitTracker" component={HabitTrackerPresenter} />
+      <Stack.Screen name="avatarPicker" component={AvatarPickerView} />
+    </Stack.Navigator>
   );
 }
