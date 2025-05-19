@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "expo start",
     "dev_clear": "expo start --clear",
-    "build": "npx expo export"
+    "build": "npx expo export --platform web"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
