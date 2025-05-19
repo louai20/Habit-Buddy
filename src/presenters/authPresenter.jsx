@@ -64,6 +64,14 @@ const mapDispatchToProps = (dispatch) => ({
   onLogout: () => {
     dispatch(logout());
     AsyncStorage.removeItem('uid'); // Remove uid from AsyncStorage
+    if (typeof window !== 'undefined' && window.alert) {
+      window.alert('You have been logged out.');
+    } else {
+      // For React Native
+      import('react-native').then(({ Alert }) => {
+        Alert.alert('Logout', 'You have been logged out.');
+      });
+    }
   },
   onSetUser: (user) => dispatch(setUser(user)), // Store user in Redux state
 });

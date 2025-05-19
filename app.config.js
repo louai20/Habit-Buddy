@@ -42,12 +42,12 @@ export default {
       eas: {
         projectId: "63860792-6cb6-45e6-b7f6-dae7c8d7b6f5",
       },
-      firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-      firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      firebaseProjectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-      firebaseStorageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      firebaseMessagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+      firebaseApiKey: process.env.FIREBASE_API_KEY,
+      firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+      firebaseStorageBucket: process.env.STORAGE_BUCKET,
+      firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      firebaseAppId: process.env.FIREBASE_APP_ID,
     },
     owner: "louaialayoubi",
     runtimeVersion: {
