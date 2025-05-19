@@ -102,7 +102,7 @@ export function DashboardView({ habits }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
+      <Text style={styles.title}>Dashboard</Text>
       {/* Gradient Header */}
       <View style={styles.welcomeCard}>
         <Text style={styles.greeting}>

@@ -10,14 +10,14 @@ export function AuthView(props) {
       {props.loading && <Text>Loading...</Text>}
       {props.error && <Text style={styles.errorText}>{props.error}</Text>}
       {props.user && props.user.uid ? (
-        <View>
+        <View style={styles.rowContainer}>
           <Text style={styles.welcomeText}>Welcome, {props.user.name}</Text>
           <Pressable style={styles.button} onPress={props.onLogout}>
             <Text style={styles.buttonText}>Logout</Text>
           </Pressable>
         </View>
       ) : (
-[]
+        []
       )}
     </View>
   );
@@ -28,10 +28,16 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'flex-end',
   },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   welcomeText: {
     fontSize: 18,
-    marginBottom: 20,
     color: '#333',
+    marginRight: 10,
   },
   buttonContainer: {
     flexDirection: 'row', // Align buttons horizontally
