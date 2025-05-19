@@ -15,7 +15,11 @@ const RegisterPresenter = ({ register, loading, error, user }) => { // Add user 
   useEffect(() => {
     if (user) {
       // Show success alert before navigating
-      Alert.alert('Success', `Registration successful! Welcome, ${user.name}.`);
+      if (typeof window !== 'undefined' && window.alert) {
+        window.alert(`Registration successful! Welcome, ${user.name}.`);
+      } else {
+        Alert.alert('Success', `Registration successful! Welcome, ${user.name}.`);
+      }
       navigation.navigate('MainTabs', { screen: 'dashboard' }); // Navigate to dashboard on successful registration/login
     }
   }, [user, navigation]);
@@ -24,7 +28,11 @@ const RegisterPresenter = ({ register, loading, error, user }) => { // Add user 
   useEffect(() => {
     if (error) {
       // Show error alert if registration fails
-      Alert.alert('Registration Failed', error);
+      if (typeof window !== 'undefined' && window.alert) {
+        window.alert(`Registration Failed: ${error}`);
+      } else {
+        Alert.alert('Registration Failed', error);
+      }
     }
   }, [error]);
 
@@ -67,7 +75,7 @@ const mapStateToProps = (state) => ({
   user: state.auth.user, // Add user state to props
 });
 
-// map dispatcher to props – no need to use `dispatch` manually in component
+// map dispatcher to props  no need to use `dispatch` manually in component
 const mapDispatchToProps = (dispatch) => ({
   register: (email, password, name) =>
     dispatch(registerWithEmail({ email, password, name })),

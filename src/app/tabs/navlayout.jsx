@@ -11,6 +11,7 @@ import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import HabitTrackerPresenter from "../../presenters/habitTrackerPresenter";
 import AvatarPickerView from "../../views/avatarPickerView";
+import CustomTabBar from './CustomTabBar';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -20,8 +21,8 @@ function MainTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        style: { justifyContent: 'space-around' }
       }}
+      tabBar={props => <CustomTabBar {...props} />}
     >
       <Tab.Screen
         name="dashboard"
@@ -45,6 +46,34 @@ function MainTabs() {
         options={{
           title: 'Progress',
           tabBarIcon: () => <Text>📊</Text>,
+        }}
+      />
+      <Tab.Screen
+        name="addHabit"
+        component={AddHabitPresenter}
+        options={{
+          tabBarButton: () => null, // Hide from tab bar
+        }}
+      />
+      <Tab.Screen
+        name="editHabit"
+        component={EditHabitPresenter}
+        options={{
+          tabBarButton: () => null, // Hide from tab bar
+        }}
+      />
+      <Tab.Screen
+        name="habitTracker"
+        component={HabitTrackerPresenter}
+        options={{
+          tabBarButton: () => null, // Hide from tab bar
+        }}
+      />
+      <Tab.Screen
+        name="avatarPicker"
+        component={AvatarPickerView}
+        options={{
+          tabBarButton: () => null, // Hide from tab bar
         }}
       />
     </Tab.Navigator>
