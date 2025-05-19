@@ -30,7 +30,7 @@ export default function avatarPickerPresenter() {
     } catch (e) {
       console.error('Failed to persist avatar seed', e);
     }
-    navigation.goBack();
+    navigation.replace('MainTabs', { screen: 'dashboard' });
   };
 
   // URL for preview image
