@@ -116,10 +116,12 @@ export function DashboardView({ habits }) {
           style={styles.avatar}
         />
         <View style={styles.changeButton}>
-          <Button
-            title="Change Avatar"
+          <TouchableOpacity
+            style={styles.changeButton}
             onPress={() => navigation.navigate('avatarPicker')}
-          />
+          >
+            <Text style={styles.changeButtonText}>Change Avatar</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -135,7 +137,12 @@ export function DashboardView({ habits }) {
           <>
             <Text style={styles.quote}>"{quote.text}" — {quote.author}</Text>
             <View style={styles.buttonWrapper}>
-              <Button title="NEW QUOTE" onPress={() => dispatch(fetchQuote())} color="#007bff" />
+              <TouchableOpacity
+                style={styles.smallButton}
+                onPress={() => dispatch(fetchQuote())}
+              >
+                <Text style={styles.smallButtonText}>NEW QUOTE</Text>
+              </TouchableOpacity>
             </View>
           </>
         ) : null}
@@ -275,8 +282,25 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   changeButton: {
-    width: 140,
     marginTop: 5,
+    backgroundColor: '#007bff',
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 2,
+  },
+  changeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   habitGrid: {
     flexDirection: 'row',
@@ -296,6 +320,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
     marginBottom: 4,
+  },
+  smallButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  smallButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   avatar: {
     width: 80,
