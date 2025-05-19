@@ -1,9 +1,16 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import ProgressView from "../views/progressView";
+import { connect } from "react-redux";
+import { ProgressView } from "../views/progressView";
+import { UnauthorizedView } from "../views/unauthorizedView";
 
-const ProgressPresenter = () => {
-  const habits = useSelector((state) => state.habits.habits);
+const mapStateToProps = (state) => ({
+  user: state.auth.user,
+  habits: state.habits.habits
+});
+
+const ProgressPresenter = ({ user, habits }) => {
+  if (!user?.uid) {
+    return <UnauthorizedView />
+  }
 
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -35,4 +42,4 @@ const ProgressPresenter = () => {
   );
 };
 
-export default ProgressPresenter;
+export default connect(mapStateToProps)(ProgressPresenter);

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
-const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
+export const ProgressView = ({ habits, dayLabels, dailyCompletion }) => {
   const today = new Date().toISOString().split("T")[0];
 
   // turn all values into numbers
