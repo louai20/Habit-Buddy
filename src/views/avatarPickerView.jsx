@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, Image, Button, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import AvatarPicker from '../components/avatarPicker';
 
 export default function AvatarPickerView({
@@ -11,14 +10,6 @@ export default function AvatarPickerView({
   handleSelect,
   handleSave
 }) {
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    if (!user || !user.uid) {
-      navigation.replace('login');
-    }
-  }, [user, navigation]);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose Your Avatar</Text>
