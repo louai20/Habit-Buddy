@@ -1,101 +1,50 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Button, ScrollView, Image } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchQuote } from '../models/quotesSlice';
-import { fetchWeather } from '../models/weatherSlice';
-import { markHabitAsDone, unmarkHabitAsDone } from '../models/habitsSlice';
-import * as Location from 'expo-location'; 
-import { Calendar } from 'react-native-calendars';
-import { TouchableOpacity } from 'react-native';
-import { useState } from "react";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import WeatherCard from '../components/WeatherCard';
 
-export function DashboardView({ habits }) {
-  const dispatch = useDispatch();
+export function DashboardView({
+  user,
+  habits,
+  quote,
+  quoteLoading,
+  quoteError,
+  currentWeather,
+  weatherForecast,
+  weatherLoading,
+  weatherError,
+  city,
+  locationDenied,
+  locationError,
+  onFetchQuote,
+  onFetchWeather,
+  onMarkHabitAsDone,
+  onUnmarkHabitAsDone,
+}) {
   const navigation = useNavigation();
-
-  const [city, setCity] = useState('');
-
-  const user = useSelector((state) => state.auth.user); // Get username for the header
-  const { quote, loading: quoteLoading, error: quoteError } = useSelector(state => state.quotes);
-  const { current, forecast, loading: weatherLoading, error: weatherError } = useSelector(state => state.weather);
-  const userHabits = useSelector((state) => state.habits.habits);
-
   const today = new Date().toISOString().split('T')[0];
-  const [locationError, setLocationError] = useState('');
   const [localDone, setLocalDone] = useState({});
-  const [locationDenied, setLocationDenied] = useState(false);
-  const completedToday = userHabits.filter(h => h.completedDates?.includes(today)).length;
-  const scheduledToday = userHabits.filter(h => today >= h.startDate && today <= h.endDate).length;
-  const topHabit = userHabits.reduce((top, h) => {
+
+  const completedToday = habits.filter(h => h.completedDates?.includes(today)).length;
+  const scheduledToday = habits.filter(h => today >= h.startDate && today <= h.endDate).length;
+  const topHabit = habits.reduce((top, h) => {
     const count = h.completedDates?.length || 0;
     return count > (top.count || 0) ? { name: h.name, count } : top;
   }, { name: '-', count: 0 });
-  const [hasAskedLocationPermission, setHasAskedLocationPermission] = useState(false);
-  useEffect(() => {
-    dispatch(fetchQuote());
-    
-    if (!hasAskedLocationPermission) {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setLocationDenied(true);
-          setHasAskedLocationPermission(true); // Mark as asked
-          setLocationError('Location permission not granted.');
-          console.error("Location permission not granted.");
-          return;
-        }
 
-        try {
-          let location = await Location.getCurrentPositionAsync({});
-          dispatch(fetchWeather({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }));
-
-          let address = await Location.reverseGeocodeAsync(location.coords);
-          if (address.length > 0) {
-            setCity(address[0].city || address[0].region || "Your City");
-          }
-          setLocationDenied(false); // Reset if permission is granted
-          setLocationError('');
-          setHasAskedLocationPermission(true); // Mark as asked
-        } catch (err) {
-          console.error('Error getting location:', err);
-          setLocationDenied(true);
-          setLocationError('Error getting location: ' + err.message);
-          setHasAskedLocationPermission(true); // Mark as asked even if there's an error
-        }
-      })();
-    }
-  }, [dispatch, hasAskedLocationPermission]);
-  const markedDates = {};
-  userHabits?.forEach((habit) => {
-    const completed = habit.completedDates || [];
-    completed.forEach((date) => {
-      markedDates[date] = { marked: true, dotColor: '#00adf5' };
-    });
-  });  
-    const handleLocationRequest = async () => {
+  const handleLocationRequest = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
-        // Location permission granted, now get the current position
         let location = await Location.getCurrentPositionAsync({});
-        dispatch(fetchWeather({
+        onFetchWeather({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-        }));
-        setLocationDenied(false); // Reset location denied state
+        });
       } else {
-        setLocationDenied(true); // If permission denied, set state
         Alert.alert('Permission Denied', 'Location permission is required.');
       }
     } catch (err) {
-      // Catch errors, log them and display a message
-      console.error("Error getting location:", err);
-      setLocationDenied(true);
       Alert.alert('Error', 'Unable to retrieve location. Please try again.');
     }
   };
@@ -103,7 +52,7 @@ export function DashboardView({ habits }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
-      {/* Gradient Header */}
+
       <View style={styles.welcomeCard}>
         <Text style={styles.greeting}>
           👋 Welcome Back{user?.name ? `, ${user.name}` : ''}!
@@ -115,20 +64,17 @@ export function DashboardView({ habits }) {
           }}
           style={styles.avatar}
         />
-        <View style={styles.changeButton}>
-          <TouchableOpacity
-            style={styles.changeButton}
-            onPress={() => navigation.navigate('avatarPicker')}
-          >
-            <Text style={styles.changeButtonText}>Change Avatar</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.changeButton}
+          onPress={() => navigation.navigate('avatarPicker')}
+        >
+          <Text style={styles.changeButtonText}>Change Avatar</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Quote Section */}
       <View style={styles.card}>
         <Text style={styles.quoteTitle}>✨ Daily Motivation ✨</Text>
-
         {quoteLoading ? (
           <Text style={styles.loading}>Loading quote...</Text>
         ) : quoteError ? (
@@ -136,14 +82,9 @@ export function DashboardView({ habits }) {
         ) : quote ? (
           <>
             <Text style={styles.quote}>"{quote.text}" — {quote.author}</Text>
-            <View style={styles.buttonWrapper}>
-              <TouchableOpacity
-                style={styles.smallButton}
-                onPress={() => dispatch(fetchQuote())}
-              >
-                <Text style={styles.smallButtonText}>NEW QUOTE</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.smallButton} onPress={onFetchQuote}>
+              <Text style={styles.smallButtonText}>NEW QUOTE</Text>
+            </TouchableOpacity>
           </>
         ) : null}
       </View>
@@ -155,23 +96,19 @@ export function DashboardView({ habits }) {
           <Text style={styles.loading}>Loading weather...</Text>
         ) : locationDenied ? (
           <TouchableOpacity onPress={handleLocationRequest}>
-            <Text style={styles.permissionPrompt}>
-              📍 Location access needed. Tap here to allow.
-            </Text>
+            <Text style={styles.permissionPrompt}>📍 Tap here to allow location</Text>
           </TouchableOpacity>
         ) : weatherError ? (
           <Text style={styles.error}>Weather error: {weatherError}</Text>
-        ) : current ? (
+        ) : currentWeather ? (
           <WeatherCard
-            city={"Stockholm"}
-            currentTemp={current.temperature}
-            forecast={
-              forecast.time.slice(0, 5).map((date, index) => ({
-                day: new Date(date).toLocaleDateString(undefined, { weekday: 'short' }),
-                tempMin: forecast.temperature_2m_min[index],
-                tempMax: forecast.temperature_2m_max[index],
-              }))
-            }
+            city={city}
+            currentTemp={currentWeather.temperature}
+            forecast={weatherForecast.time.slice(0, 5).map((date, i) => ({
+              day: new Date(date).toLocaleDateString(undefined, { weekday: 'short' }),
+              tempMin: weatherForecast.temperature_2m_min[i],
+              tempMax: weatherForecast.temperature_2m_max[i],
+            }))}
           />
         ) : null}
       </View>
@@ -209,12 +146,10 @@ export function DashboardView({ habits }) {
 
       {/* Habits Section */}
       <Text style={styles.sectionTitle}>📋 Your Habits</Text>
-      {userHabits?.length > 0 ? (
+      {habits?.length > 0 ? (
         <View style={styles.habitGrid}>
-          {userHabits.map((habit) => {
-            const updatedHabit = userHabits.find(h => h.id === habit.id);
-            const completedDates = updatedHabit?.completedDates || [];          
-            const isDoneToday = localDone[habit.id] ?? completedDates.includes(today);
+          {habits.map((habit) => {
+            const isDoneToday = localDone[habit.id] ?? habit.completedDates?.includes(today);
 
             return (
               <View key={habit.id} style={styles.habitItem}>
@@ -222,16 +157,16 @@ export function DashboardView({ habits }) {
                 <TouchableOpacity
                   style={[styles.doneButton, isDoneToday && styles.doneButtonComplete]}
                   onPress={() => {
-                    const currentlyDone = localDone[habit.id] ?? completedDates.includes(today);
-                  
+                    const currentlyDone = localDone[habit.id] ?? habit.completedDates?.includes(today);
+
                     if (currentlyDone) {
-                      dispatch(unmarkHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                      onUnmarkHabitAsDone({ userId: user.uid, habitId: habit.id });
                       setLocalDone(prev => ({ ...prev, [habit.id]: false }));
                     } else {
-                      dispatch(markHabitAsDone({ userId: user.uid, habitId: habit.id }));
+                      onMarkHabitAsDone({ userId: user.uid, habitId: habit.id });
                       setLocalDone(prev => ({ ...prev, [habit.id]: true }));
                     }
-                  }}                
+                  }}
                 >
                   <Text style={isDoneToday ? styles.doneTextComplete : styles.doneText}>
                     {isDoneToday ? '✅ Done' : 'Mark as Done'}
@@ -245,7 +180,6 @@ export function DashboardView({ habits }) {
         <Text style={styles.noHabits}>No habits yet</Text>
       )}
 
-      {/* Add Habit Button */}
       <View style={styles.buttonContainer}>
         <Button
           title="+ ADD NEW HABIT"

@@ -1,30 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import { setAvatarSeed } from '../models/authSlice';
+import { UnauthorizedView } from '../views/unauthorizedView';
+import AvatarPickerView from '../views/avatarPickerView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 
 const avatarSeeds = ['Easton', 'Maria', 'Sara', 'Jocelyn', 'George'];
 
-export default function avatarPickerPresenter() {
-  const dispatch = useDispatch();
+const mapStateToProps = (state) => ({
+  user: state.auth.user,
+  currentSeed: state.auth.user?.avatarSeed || 'Easton',
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onSetAvatarSeed: (seed) => dispatch(setAvatarSeed(seed)),
+});
+
+const AvatarPickerPresenter = ({ user, currentSeed, onSetAvatarSeed }) => {
   const navigation = useNavigation();
-  const currentSeed = useSelector(state => state.auth.user?.avatarSeed || 'Easton');
   const [selectedSeed, setSelectedSeed] = useState(currentSeed);
 
-  // Keep local state in sync with Redux
   useEffect(() => {
     setSelectedSeed(currentSeed);
   }, [currentSeed]);
 
-  // Called when a thumbnail is tapped
   const handleSelect = (seed) => {
     setSelectedSeed(seed);
   };
 
-  // Save to Redux & AsyncStorage, then go back
   const handleSave = async () => {
-    dispatch(setAvatarSeed(selectedSeed));
+    onSetAvatarSeed(selectedSeed);
     try {
       await AsyncStorage.setItem('avatarSeed', selectedSeed);
     } catch (e) {
@@ -33,14 +39,20 @@ export default function avatarPickerPresenter() {
     navigation.replace('MainTabs', { screen: 'dashboard' });
   };
 
-  // URL for preview image
-  const previewUri = `https://api.dicebear.com/9.x/adventurer/png?seed=${selectedSeed}`;
+  if (!user?.uid) {
+    return <UnauthorizedView />;
+  }
 
-  return {
-    avatarSeeds,
-    selectedSeed,
-    previewUri,
-    handleSelect,
-    handleSave,
-  };
-}
+  return (
+    <AvatarPickerView
+      user={user}
+      avatarSeeds={avatarSeeds}
+      selectedSeed={selectedSeed}
+      previewUri={`https://api.dicebear.com/9.x/adventurer/png?seed=${selectedSeed}`}
+      handleSelect={handleSelect}
+      handleSave={handleSave}
+    />
+  );
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AvatarPickerPresenter);
