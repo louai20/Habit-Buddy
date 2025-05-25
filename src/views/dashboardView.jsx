@@ -32,23 +32,6 @@ export function DashboardView({
     return count > (top.count || 0) ? { name: h.name, count } : top;
   }, { name: '-', count: 0 });
 
-  const handleLocationRequest = async () => {
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        let location = await Location.getCurrentPositionAsync({});
-        onFetchWeather({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-      } else {
-        Alert.alert('Permission Denied', 'Location permission is required.');
-      }
-    } catch (err) {
-      Alert.alert('Error', 'Unable to retrieve location. Please try again.');
-    }
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
@@ -94,12 +77,6 @@ export function DashboardView({
         <Text style={styles.sectionTitle}>🌤️ Weather</Text>
         {weatherLoading ? (
           <Text style={styles.loading}>Loading weather...</Text>
-        ) : locationDenied ? (
-          <TouchableOpacity onPress={handleLocationRequest}>
-            <Text style={styles.permissionPrompt}>📍 Tap here to allow location</Text>
-          </TouchableOpacity>
-        ) : weatherError ? (
-          <Text style={styles.error}>Weather error: {weatherError}</Text>
         ) : currentWeather ? (
           <WeatherCard
             city={city}
