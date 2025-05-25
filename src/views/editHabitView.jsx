@@ -16,7 +16,7 @@ import { Input } from "react-native-elements";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
+export function EditHabitView({ user, habits, loading, error, onUpdateHabit, onDeleteHabit }) {
   const route = useRoute();
   const navigation = useNavigation();
   const habitFromRoute = route.params?.habit;
@@ -101,28 +101,34 @@ export function EditHabitView({ user, habits, onUpdateHabit, onDeleteHabit }) {
       return;
     }
 
+    const updatedHabit = {
+      ...habitData,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    };
+
     try {
       setIsUpdating(true);
-      const updatedHabit = {
-        ...habitData,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-      };
-
       await onUpdateHabit({
         userId: user.uid,
         habitId: selectedHabit.id,
         updatedData: updatedHabit,
       });
 
-      if (Platform.OS === "web") {
-        window.alert("Success\n\nHabit updated successfully!");
-      } else {
-        Alert.alert("Success", "Habit updated successfully!");
+      if (!error) {
+        if (Platform.OS === "web") {
+          window.alert("Success\n\nHabit updated successfully!");
+        } else {
+          Alert.alert("Success", "Habit updated successfully!");
+        }
+        navigation.navigate('MainTabs', { screen: "habit" });
       }
-      navigation.navigate('MainTabs',{screen: "habit"});
-    } catch (error) {
-      Alert.alert("EditHabitView: Error updating habit:", error);
+    } catch (err) {
+      if (Platform.OS === "web") {
+        window.alert(error || "Failed to update habit. Please try again.");
+      } else {
+        Alert.alert("Error", error || "Failed to update habit. Please try again.");
+      }
     } finally {
       setIsUpdating(false);
     }

@@ -5,16 +5,17 @@ import { UnauthorizedView } from "../views/unauthorizedView";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  habits: state.habits.habits
+  habits: state.habits.habits,
+  loading: state.habits.loading,
+  error: state.habits.error
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onUpdateHabit: (userId, habitId, habitData) => dispatch(updateHabit(userId, habitId, habitData)),
-  onDeleteHabit: (userid, habitId) => dispatch(deleteHabit(userid, habitId)),
+  onUpdateHabit: ({ habitId, updatedData }) => dispatch(updateHabit({ habitId, updatedData })),
+  onDeleteHabit: ({ userId, habitId }) => dispatch(deleteHabit(habitId)),
 });
 
-const HabitPresenter = ({ user, habits, onUpdateHabit, onDeleteHabit }) => {
-
+const HabitPresenter = ({ user, habits, loading, error, onUpdateHabit, onDeleteHabit }) => {
   // Check if user is logged in
   if (!user?.uid) {
     return <UnauthorizedView />
@@ -24,10 +25,11 @@ const HabitPresenter = ({ user, habits, onUpdateHabit, onDeleteHabit }) => {
     <HabitView
       user={user}
       habits={habits}
+      loading={loading}
+      error={error}
       onDeleteHabit={onDeleteHabit}
-
     />
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HabitPresenter); 
+export default connect(mapStateToProps, mapDispatchToProps)(HabitPresenter);

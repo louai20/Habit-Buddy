@@ -6,6 +6,8 @@ import { Calendar } from "react-native-calendars";
 export function HabitTrackerView({
   user,
   habits,
+  loading,
+  error,
   onMarkHabitDone,
   onUnmarkHabitDone,
 }) {

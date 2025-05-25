@@ -15,7 +15,7 @@ import { Input } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 
-export function AddHabitView({ user, onSetHabit }) {
+export function AddHabitView({ user, onAddHabit, loading, error }) {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Add open state for DropDownPicker
@@ -88,24 +88,30 @@ export function AddHabitView({ user, onSetHabit }) {
         ...habitData,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
+        userId: user.uid // Add userId to the habit data
       };
 
-      await onSetHabit(newHabit, user.uid);
-      if (Platform.OS === "web") {
-        window.alert("Success\n\nHabit added successfully!");
-      } else {
-        Alert.alert("Success", "Habit added successfully!");
-      }
+      await onAddHabit(newHabit);
+      
+      if (!error) {
+        if (Platform.OS === "web") {
+          window.alert("Success\n\nHabit added successfully!");
+        } else {
+          Alert.alert("Success", "Habit added successfully!");
+        }
 
-      // Reset form data
-      setHabitData({
-        name: "",
-        description: "",
-        frequency: "",
-        startDate: new Date(),
-        endDate: new Date(),
-      });
-      navigation.navigate('MainTabs', { screen: 'dashboard' });
+        // Reset form data
+        setHabitData({
+          name: "",
+          description: "",
+          frequency: "",
+          startDate: new Date(),
+          endDate: new Date(),
+        });
+        navigation.navigate('MainTabs', { screen: 'dashboard' });
+      } else {
+        throw new Error(error);
+      }
     } catch (error) {
       if (Platform.OS === "web") {
         window.alert("Failed to add habit. Please try again.");

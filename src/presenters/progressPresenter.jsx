@@ -4,10 +4,12 @@ import { UnauthorizedView } from "../views/unauthorizedView";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  habits: state.habits.habits
+  habits: state.habits.habits,
+  loading: state.habits.loading,
+  error: state.habits.error
 });
 
-const ProgressPresenter = ({ user, habits }) => {
+const ProgressPresenter = ({ user, habits, loading, error }) => {
   if (!user?.uid) {
     return <UnauthorizedView />
   }
@@ -38,6 +40,8 @@ const ProgressPresenter = ({ user, habits }) => {
       habits={habits}
       dailyCompletion={dailyCompletion}
       dayLabels={dayLabels}
+      loading={loading}
+      error={error}
     />
   );
 };

@@ -2,7 +2,7 @@ import { View, Text, FlatList, StyleSheet, Pressable, Platform, Alert } from "re
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
-export function HabitView({ user, habits, onDeleteHabit }) {
+export function HabitView({ user, habits, loading, error, onDeleteHabit }) {
   const navigation = useNavigation();
   const [deletingHabitId, setDeletingHabitId] = useState(null);
 
@@ -10,22 +10,19 @@ export function HabitView({ user, habits, onDeleteHabit }) {
     try {
       setDeletingHabitId(habitId);
       await onDeleteHabit({ userId, habitId });
-      if (Platform.OS === 'web') {
-        window.alert("Habit deleted successfully!");
-      } else {
-        Alert.alert(
-          "Success",
-          "Habit deleted successfully!"
-        );
+      
+      if (!error) {
+        if (Platform.OS === 'web') {
+          window.alert("Habit deleted successfully!");
+        } else {
+          Alert.alert("Success", "Habit deleted successfully!");
+        }
       }
-    } catch (error) {
+    } catch (err) {
       if (Platform.OS === 'web') {
-        window.alert("Failed to delete habit. Please try again.");
+        window.alert(error || "Failed to delete habit. Please try again.");
       } else {
-        Alert.alert(
-          "Error",
-          "Failed to delete habit. Please try again."
-        );
+        Alert.alert("Error", error || "Failed to delete habit. Please try again.");
       }
     } finally {
       setDeletingHabitId(null);
@@ -98,6 +95,7 @@ export function HabitView({ user, habits, onDeleteHabit }) {
   );
 }
 
+// Add to existing styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -217,5 +215,8 @@ const styles = StyleSheet.create({
   },
   trackerButton: {
     backgroundColor: '#10b981', // Green color for the tracker button
+  },
+  errorText: {
+    color: '#ef4444',
   },
 });
