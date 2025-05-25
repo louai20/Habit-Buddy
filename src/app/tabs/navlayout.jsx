@@ -10,7 +10,7 @@ import LoginPresenter from '../../presenters/loginPresenter';
 import AddHabitPresenter from '../../presenters/addHabitPresenter';
 import EditHabitPresenter from '../../presenters/editHabitPresenter';
 import HabitTrackerPresenter from "../../presenters/habitTrackerPresenter";
-import AvatarPickerView from "../../views/avatarPickerView";
+import AvatarPickerPresenter from "../../presenters/avatarPickerPresenter";
 import CustomTabBar from './CustomTabBar';
 
 const Tab = createBottomTabNavigator();
@@ -71,7 +71,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="avatarPicker"
-        component={AvatarPickerView}
+        component={AvatarPickerPresenter}
         options={{
           tabBarButton: () => null, // Hide from tab bar
         }}
@@ -89,7 +89,7 @@ export default function TabsLayout() {
       <Stack.Screen name="addHabit" component={AddHabitPresenter} />
       <Stack.Screen name="editHabit" component={EditHabitPresenter} />
       <Stack.Screen name="habitTracker" component={HabitTrackerPresenter} />
-      <Stack.Screen name="avatarPicker" component={AvatarPickerView} />
+      <Stack.Screen name="avatarPicker" component={AvatarPickerPresenter} />
     </Stack.Navigator>
   );
 }

@@ -43,7 +43,7 @@ const DashboardPresenter = ({
   onUnmarkHabitAsDone,
   onFetchHabits,
 }) => {
-  const [city, setCity] = useState("Your City");
+  const [city, setCity] = useState("Stockholm");
   const [locationError, setLocationError] = useState("");
   const [locationDenied, setLocationDenied] = useState(false);
   const [hasAskedPermission, setHasAskedPermission] = useState(false);
