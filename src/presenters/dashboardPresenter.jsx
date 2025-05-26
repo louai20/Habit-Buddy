@@ -6,6 +6,7 @@ import { fetchQuote } from "../models/quotesSlice";
 import { fetchWeather } from "../models/weatherSlice";
 import { markHabitAsDone, unmarkHabitAsDone, fetchHabits } from "../models/habitsSlice";
 import * as Location from "expo-location";
+import { getCityFromCoords } from "../utils/reverseGeocode"; 
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
@@ -43,49 +44,43 @@ const DashboardPresenter = ({
   onUnmarkHabitAsDone,
   onFetchHabits,
 }) => {
-  const [city, setCity] = useState("Stockholm");
+  const [city, setCity] = useState(null);
   const [locationError, setLocationError] = useState("");
   const [locationDenied, setLocationDenied] = useState(false);
-  const [hasAskedPermission, setHasAskedPermission] = useState(false);
 
   useEffect(() => {
-    if (user?.uid) {
-      onFetchHabits(user.uid);
-    }
-  }, [user]);
+    if (!user?.uid) return;
 
-  useEffect(() => {
+    onFetchHabits(user.uid);
     onFetchQuote();
 
-    if (!hasAskedPermission) {
-      (async () => {
-        try {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-            setLocationDenied(true);
-            setLocationError("Location permission not granted.");
-            return;
-          }
-
-          let location = await Location.getCurrentPositionAsync({});
-          onFetchWeather({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-
-          let address = await Location.reverseGeocodeAsync(location.coords);
-          if (address.length > 0) {
-            setCity(address[0].city || address[0].region || "Your City");
-          }
-        } catch (err) {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
           setLocationDenied(true);
-          setLocationError("Error getting location: " + err.message);
-        } finally {
-          setHasAskedPermission(true);
+          setLocationError("Location permission not granted.");
+          return;
         }
-      })();
-    }
-  }, [onFetchQuote, onFetchWeather, hasAskedPermission]);
+
+        const location = await Location.getCurrentPositionAsync({});
+        const coords = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+
+        onFetchWeather(coords);
+
+        // Get city using OpenCage API
+        const locationName = await getCityFromCoords(coords.latitude, coords.longitude);
+        setCity(locationName);
+
+      } catch (err) {
+        setLocationDenied(true);
+        setLocationError("Error getting location: " + err.message);
+      }
+    })();
+  }, [user]);
 
   if (!user?.uid) {
     return <UnauthorizedView />;
@@ -106,7 +101,7 @@ const DashboardPresenter = ({
       onFetchWeather={onFetchWeather}
       onMarkHabitAsDone={onMarkHabitAsDone}
       onUnmarkHabitAsDone={onUnmarkHabitAsDone}
-      city={city}
+      city={city || "Your City"}
       locationError={locationError}
       locationDenied={locationDenied}
     />
