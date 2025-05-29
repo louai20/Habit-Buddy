@@ -1,20 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, getDoc, query, orderBy, addDoc, where, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from "../firebaseCon";
-
-const DOCUMENT = "users";
+import { habitService } from '../services/habitService';
 
 // Async thunk for fetching habits
 export const fetchHabits = createAsyncThunk(
   'habits/fetchHabits',
   async (userId, { rejectWithValue }) => {
     try {
-      const docSnapshot = await getDoc(doc(db, DOCUMENT, userId));
-      if (docSnapshot.exists()) {
-        return docSnapshot.data(); 
-      } else {
-        return rejectWithValue('Habit not found'); 
-      }
+      return await habitService.fetchHabits(userId);
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -26,20 +18,10 @@ export const setHabit = createAsyncThunk(
   'habits/setHabit',
   async ({ habitData, userId }) => {
     try {
-      const userHabitsDoc = doc(db, DOCUMENT, userId);
-      
-      // Create a new habit with a unique ID
-      const newHabit = {
-        id: Date.now().toString(), // Simple unique ID using timestamp
-        ...habitData
-      };
-  
-      await setDoc(userHabitsDoc, {
-        habits: arrayUnion(newHabit)
-      }, { merge: true });
-  
+      return await habitService.setHabit(habitData, userId);
     } catch (error) {
       console.error('Error adding habit:', error);
+      throw error;
     }
   }
 );
@@ -48,23 +30,8 @@ export const deleteHabit = createAsyncThunk(
   'habits/deleteHabit',
   async ({ userId, habitId }, { getState, rejectWithValue }) => {
     try {
-      const userHabitsDoc = doc(db, DOCUMENT, userId);
-
       const currentHabits = getState().habits.habits;
-
-      if (currentHabits.length === 0) {
-        throw new Error('No habits found in the store');
-      }
-
-      const updatedHabits = currentHabits.filter(habit => habit.id !== habitId);
-
-      if (updatedHabits.length === currentHabits.length) {
-        throw new Error('Habit to delete was not found.');
-      }
-
-      await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
-
-      return habitId;
+      return await habitService.deleteHabit(userId, habitId, currentHabits);
     } catch (error) {
       console.error('Error deleting habit:', error);
       return rejectWithValue(error.message);
@@ -76,24 +43,8 @@ export const updateHabit = createAsyncThunk(
   'habits/updateHabit',
   async ({ userId, habitId, updatedData }, { getState, rejectWithValue }) => {
     try {
-
-      const userHabitsDoc = doc(db, DOCUMENT, userId);
       const currentHabits = getState().habits.habits;
-
-      if (currentHabits.length === 0) {
-        throw new Error('No habits found.');
-      }
-
-
-      const updatedHabits = currentHabits.map(habit =>
-        habit.id === habitId ? { ...habit, ...updatedData } : habit
-      );
-
-      
-      // Firestore update
-      await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
-
-      return { habitId, updatedData };
+      return await habitService.updateHabit(userId, habitId, updatedData, currentHabits);
     } catch (error) {
       console.error('Error updating habit:', error);
       return rejectWithValue(error.message);
@@ -101,33 +52,12 @@ export const updateHabit = createAsyncThunk(
   }
 );
 
-// Async thunk for marking a habit as done today
 export const markHabitAsDone = createAsyncThunk(
   'habits/markHabitAsDone',
   async ({ userId, habitId }, { getState, rejectWithValue }) => {
     try {
-      const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
-      const userHabitsDoc = doc(db, DOCUMENT, userId);
       const currentHabits = getState().habits.habits;
-
-      const updatedHabits = currentHabits.map(habit => {
-        if (habit.id === habitId) {
-          const existing = habit.completedDates || [];
-          const alreadyDone = existing.includes(today);
-
-          return alreadyDone
-            ? habit
-            : {
-                ...habit,
-                completedDates: [...existing, today],
-              };
-        }
-        return habit;
-      });
-
-      await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
-
-      return { habitId, date: today };
+      return await habitService.markHabitAsDone(userId, habitId, currentHabits);
     } catch (error) {
       console.error('Error marking habit as done:', error);
       return rejectWithValue(error.message);
@@ -138,24 +68,8 @@ export const markHabitAsDone = createAsyncThunk(
 export const unmarkHabitAsDone = createAsyncThunk(
   "habits/unmarkHabitAsDone",
   async ({ userId, habitId }, { getState }) => {
-    const userHabitsDoc = doc(db, "users", userId);
     const currentHabits = getState().habits.habits;
-
-    const updatedHabits = currentHabits.map((habit) => {
-      if (habit.id === habitId) {
-        return {
-          ...habit,
-          completedDates: (habit.completedDates || []).filter(
-            (date) => date !== new Date().toISOString().split("T")[0]
-          ),
-        };
-      }
-      return habit;
-    });
-
-    await setDoc(userHabitsDoc, { habits: updatedHabits }, { merge: true });
-
-    return { habitId, updated: updatedHabits.find((h) => h.id === habitId) };
+    return await habitService.unmarkHabitAsDone(userId, habitId, currentHabits);
   }
 );
 
@@ -168,8 +82,7 @@ const initialState = {
 export const habitsSlice = createSlice({
   name: 'habits',
   initialState,
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchHabits.pending, (state) => {
@@ -209,20 +122,14 @@ export const habitsSlice = createSlice({
       })
       .addCase(updateHabit.fulfilled, (state, action) => {
         state.loading = false;
-        const { habitId, updatedData } = action.payload; // Get habitId and updatedData from action.payload
-
-        // Find the habit in the current state that matches the habitId
+        const { habitId, updatedData } = action.payload;
         const habitIndex = state.habits.findIndex((habit) => habit.id === habitId);
-
         if (habitIndex !== -1) {
-          // Update the habit with new data
           state.habits[habitIndex] = {
             ...state.habits[habitIndex],
             ...updatedData,
           };
         }
-
-       
       })
       .addCase(updateHabit.rejected, (state, action) => {
         state.loading = false;
@@ -246,5 +153,4 @@ export const habitsSlice = createSlice({
   }
 });
 
-export const { increment, decrement } = habitsSlice.actions;
-export default habitsSlice.reducer; 
+export default habitsSlice.reducer;
