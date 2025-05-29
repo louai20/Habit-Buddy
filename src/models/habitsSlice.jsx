@@ -1,13 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { habitService } from '../services/habitService';
-
-export const fetchHabits = createAsyncThunk(
-  'habits/fetchHabits',
-  async (userId) => {
-    console.log('Fetching habits for user:', userId); // Add this line for debuggi
-    return await habitService.fetchHabits(userId);
-  }
-);
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   habits: [],
@@ -19,6 +10,20 @@ export const habitsSlice = createSlice({
   name: 'habits',
   initialState,
   reducers: {
+    // Add new reducers for handling fetch states
+    fetchHabitsStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchHabitsSuccess: (state, action) => {
+      state.loading = false;
+      state.habits = action.payload.habits || [];
+      state.error = null;
+    },
+    fetchHabitsError: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
     setHabits: (state, action) => {
       state.habits = action.payload;
       state.loading = false;
@@ -83,25 +88,13 @@ export const habitsSlice = createSlice({
       state.error = action.payload;
     }
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchHabits.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchHabits.fulfilled, (state, action) => {
-        state.loading = false;
-        state.habits = action.payload.habits || [];
-        state.error = null;
-      })
-      .addCase(fetchHabits.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch habits';
-      });
-  }
+  // Remove extraReducers entirely
 });
 
 export const { 
+  fetchHabitsStart,
+  fetchHabitsSuccess,
+  fetchHabitsError,
   setHabits,
   addHabit,
   deleteHabit,

@@ -1,7 +1,8 @@
 import { connect } from "react-redux";
+import { markHabitAsDone, unmarkHabitAsDone, habitActionSuccess, habitActionError } from "../models/habitsSlice";
 import { HabitTrackerView } from "../views/habitTrackerView";
 import { UnauthorizedView } from "../views/unauthorizedView";
-import { markHabitAsDone, unmarkHabitAsDone } from "../models/habitsSlice";
+import { habitService } from "../services/habitService";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
@@ -11,23 +12,46 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onMarkHabitDone: (userId, habitId, date) => dispatch(markHabitAsDone({ habitId, date })),
-  onUnmarkHabitDone: (userId, habitId, date) => dispatch(unmarkHabitAsDone({ habitId, date }))
+  onMarkHabitDone: (habitId, date) => dispatch(markHabitAsDone({ habitId, date })),
+  onUnmarkHabitDone: (habitId, date) => dispatch(unmarkHabitAsDone({ habitId, date })),
+  onHabitActionSuccess: () => dispatch(habitActionSuccess()),
+  onHabitActionError: (error) => dispatch(habitActionError(error)),
 });
 
-const HabitTrackerPresenter = ({ user, habits, loading, error, onMarkHabitDone, onUnmarkHabitDone }) => {
+const HabitTrackerPresenter = ({ user, habits, loading, error, onMarkHabitDone, onUnmarkHabitDone, onHabitActionSuccess, onHabitActionError }) => {
+
+  const handleMarkHabitDone = async (habitId, date) => {
+    try {
+      onMarkHabitDone(habitId, date);
+      await habitService.markHabitAsDone(user.uid, habitId, date);
+      onHabitActionSuccess();
+    } catch (error) {
+      onHabitActionError(error.message);
+    }
+  };
+
+  const handleUnmarkHabitDone = async (habitId, date) => {
+    try {
+      onUnmarkHabitDone(habitId, date);
+      await habitService.unmarkHabitAsDone(user.uid, habitId, date);
+      onHabitActionSuccess();
+    } catch (error) {
+      onHabitActionError(error.message);
+    }
+  };
+
   if (!user?.uid) {
-    return <UnauthorizedView />
+    return <UnauthorizedView />;
   }
 
   return (
-    <HabitTrackerView
-      user={user}
-      habits={habits}
-      loading={loading}
-      error={error}
-      onMarkHabitDone={onMarkHabitDone}
-      onUnmarkHabitDone={onUnmarkHabitDone}
+    <HabitTrackerView 
+      user={user} 
+      habits={habits} 
+      loading={loading} 
+      error={error} 
+      onMarkHabitDone={handleMarkHabitDone} 
+      onUnmarkHabitDone={handleUnmarkHabitDone} 
     />
   );
 };

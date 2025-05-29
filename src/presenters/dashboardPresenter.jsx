@@ -1,7 +1,7 @@
-// Presenter: HabitsPresenter.js
 import { connect } from "react-redux";
 import { DashboardView} from "../views/dashboardView";
-import { fetchHabits } from "../models/habitsSlice";
+import { fetchHabitsStart, fetchHabitsSuccess, fetchHabitsError } from "../models/habitsSlice";
+import { habitService } from "../services/habitService";
 import { useEffect } from "react";
 import { UnauthorizedView } from "../views/unauthorizedView";
 
@@ -13,13 +13,37 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onFetchHabits: (userId) => dispatch(fetchHabits(userId)),
+  onFetchHabitsStart: () => dispatch(fetchHabitsStart()),
+  onFetchHabitsSuccess: (data) => dispatch(fetchHabitsSuccess(data)),
+  onFetchHabitsError: (error) => dispatch(fetchHabitsError(error)),
 });
 
-const DashboardPresenter = ({ user, onFetchHabits, habits, loading, error }) => {
+const DashboardPresenter = ({ 
+  user, 
+  onFetchHabitsStart, 
+  onFetchHabitsSuccess, 
+  onFetchHabitsError, 
+  habits, 
+  loading, 
+  error 
+}) => {
+  
+  // Async function in presenter
+  const fetchHabits = async (userId) => {
+    try {
+      onFetchHabitsStart();
+      const data = await habitService.fetchHabits(userId);
+      onFetchHabitsSuccess(data);
+      return data;
+    } catch (error) {
+      onFetchHabitsError(error.message);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     if (user?.uid) {
-      onFetchHabits(user.uid); // Fetch habits if user ID is available
+      fetchHabits(user.uid);
     }
   }, [user]); 
 
@@ -28,7 +52,7 @@ const DashboardPresenter = ({ user, onFetchHabits, habits, loading, error }) => 
     return <UnauthorizedView />
   }
 
-  // Return the HabitsView component with the necessary props
+  // Return the DashboardView component with the necessary props
   return <DashboardView habits={habits} loading={loading} error={error} />;
 };
 

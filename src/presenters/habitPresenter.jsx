@@ -1,7 +1,8 @@
 import { connect } from "react-redux";
-import { updateHabit, deleteHabit } from "../models/habitsSlice";
+import { updateHabit, deleteHabit, habitActionSuccess, habitActionError } from "../models/habitsSlice";
 import { HabitView } from "../views/habitView";
 import { UnauthorizedView } from "../views/unauthorizedView";
+import { habitService } from "../services/habitService";
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
@@ -12,22 +13,45 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   onUpdateHabit: ({ habitId, updatedData }) => dispatch(updateHabit({ habitId, updatedData })),
-  onDeleteHabit: ({ userId, habitId }) => dispatch(deleteHabit(habitId)),
+  onDeleteHabit: (habitId) => dispatch(deleteHabit(habitId)),
+  onHabitActionSuccess: () => dispatch(habitActionSuccess()),
+  onHabitActionError: (error) => dispatch(habitActionError(error)),
 });
 
-const HabitPresenter = ({ user, habits, loading, error, onUpdateHabit, onDeleteHabit }) => {
-  // Check if user is logged in
+const HabitPresenter = ({ user, habits, loading, error, onUpdateHabit, onDeleteHabit, onHabitActionSuccess, onHabitActionError }) => {
+
+  const handleUpdateHabit = async ({ habitId, updatedData }) => {
+    try {
+      onUpdateHabit({ habitId, updatedData });
+      await habitService.updateHabit(user.uid, habitId, updatedData);
+      onHabitActionSuccess();
+    } catch (error) {
+      onHabitActionError(error.message);
+    }
+  };
+
+  const handleDeleteHabit = async (habitId) => {
+    try {
+      onDeleteHabit(habitId);
+      await habitService.deleteHabit(user.uid, habitId);
+      onHabitActionSuccess();
+    } catch (error) {
+      onHabitActionError(error.message);
+    }
+  };
+
   if (!user?.uid) {
-    return <UnauthorizedView />
+    return <UnauthorizedView />;
   }
 
   return (
-    <HabitView
-      user={user}
-      habits={habits}
-      loading={loading}
-      error={error}
-      onDeleteHabit={onDeleteHabit}
+    <HabitView 
+      user={user} 
+      habits={habits} 
+      loading={loading} 
+      error={error} 
+      onUpdateHabit={handleUpdateHabit} 
+      onDeleteHabit={handleDeleteHabit} 
     />
   );
 };

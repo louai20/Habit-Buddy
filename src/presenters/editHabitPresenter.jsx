@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { updateHabit, deleteHabit } from "../models/habitsSlice";
+import { updateHabit, deleteHabit, habitActionError, habitActionSuccess } from "../models/habitsSlice";
 import { EditHabitView } from "../views/editHabitView";
 import { UnauthorizedView } from "../views/unauthorizedView";
 
